@@ -2,10 +2,10 @@
 Attempt to create a simple program where you can paint on infinite canvas with friends.
 
 What I want to implement to achieve finished product:
-- [x] simple drawing
-- [ ] fast chunk system
-- [ ] networking
-- [ ] good ui/ux
+- [x] Simple drawing
+- [ ] Fast chunk system
+- [ ] Networking
+- [ ] Good UI/UX
 
 ## Compiling
 Simplest way is to use my little script to automate this process:
