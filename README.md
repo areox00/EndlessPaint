@@ -10,7 +10,7 @@ What i want to implement to achieve finished product:
 ## Compiling
 Simplest way is to use my little script to automate this process:
 ```
-./builder.sh -br debug
+./builder.sh -br release
 ```
 or alternatively run these commands:
 ```
