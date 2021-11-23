@@ -1,7 +1,7 @@
 # asunapixel
 Attempt to create a simple program where you can paint on infinite canvas with friends.
 
-What i want to implement to achieve finished product:
+What I want to implement to achieve finished product:
 - [x] simple drawing
 - [ ] fast chunk system
 - [ ] networking
