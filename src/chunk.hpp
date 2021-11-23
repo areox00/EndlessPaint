@@ -2,11 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 
-struct Pixel {
-	sf::Vector2u pos;
-	sf::Color color; // isn't storing color in every pixel expensive? todo: reference
-};
-
 class Chunk : public sf::Drawable {
 private:
 	sf::Texture texture;
