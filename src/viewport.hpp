@@ -17,5 +17,5 @@ public:
 
 	void init(sf::RenderWindow *window);
 	void processEvent(sf::Event &event);
-	constexpr sf::View &getView() {return view;}
+	inline const sf::View &getView() {return view;}
 };

@@ -9,7 +9,7 @@ Chunk::Chunk(sf::Vector2i index)
 	for (size_t y = 0; y < 256; y++)
 		for (size_t x = 0; x < 256; x++) {
 			pixels.setPixel(x, y, sf::Color::Black);
-		}	
+		}
 
 	texture.update(pixels);
 
@@ -29,12 +29,12 @@ void Chunk::setPixel(sf::Vector2u pos)
 }
 
 void Chunk::updateTexture()
-{	
+{
 	texture.update(pixels);
 	dirty = false;
 }
 
 void Chunk::draw(sf::RenderTarget &target, sf::RenderStates states) const
-{	
+{
 	target.draw(sprite, states);
 }

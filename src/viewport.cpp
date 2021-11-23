@@ -2,26 +2,26 @@
 
 #include <cmath>
 
-Viewport::Viewport(const sf::RenderWindow *window) 
+Viewport::Viewport(const sf::RenderWindow *window)
 	: window(window)
 {
 	view.setSize(window->getSize().x, window->getSize().y);
-	view.setCenter(0, 0);	
+	view.setCenter(0, 0);
 }
 
-Viewport::~Viewport() 
+Viewport::~Viewport()
 {
-	
+
 }
 
 void Viewport::init(sf::RenderWindow *window)
 {
 	view.setSize(window->getSize().x, window->getSize().y);
-	view.setCenter(0, 0);	
+	view.setCenter(0, 0);
 	this->window = window;
 }
 
-void Viewport::processEvent(sf::Event &event) 
+void Viewport::processEvent(sf::Event &event)
 {
 	switch (event.type) {
 		case sf::Event::Resized:
@@ -41,7 +41,7 @@ void Viewport::processEvent(sf::Event &event)
 			}
 			break;
 
-		case sf::Event::MouseButtonPressed: 
+		case sf::Event::MouseButtonPressed:
 			if (event.mouseButton.button == sf::Mouse::Right) {
 				moving = true;
 				oldPos = (sf::Vector2f)sf::Mouse::getPosition(*window);
@@ -57,7 +57,7 @@ void Viewport::processEvent(sf::Event &event)
 		case sf::Event::MouseMoved: {
 			if (!moving)
 				break;
-			
+
 			newPos = sf::Vector2f(event.mouseMove.x, event.mouseMove.y);
 
 			sf::Vector2f deltaPos = oldPos - newPos;

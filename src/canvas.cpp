@@ -38,14 +38,14 @@ inline uint64_t chunkIndexToHashmapKey(sf::Vector2i index)
 	return packed;
 }
 
-inline sf::IntRect sortVertices(const sf::IntRect &rect) 
+inline sf::IntRect sortVertices(const sf::IntRect &rect)
 {
-    int left = std::min(rect.left, rect.width);
-    int width = std::max(rect.left, rect.width);
-    int top = std::min(rect.top, rect.height);
-    int height = std::max(rect.top, rect.height);
+	int left = std::min(rect.left, rect.width);
+	int width = std::max(rect.left, rect.width);
+	int top = std::min(rect.top, rect.height);
+	int height = std::max(rect.top, rect.height);
 
-    return {left, top, width, height};
+	return {left, top, width, height};
 }
 
 Canvas::Canvas()
@@ -121,9 +121,9 @@ void Canvas::plotLine()
 
 	sf::IntRect affectedChunks;
 
-	affectedChunks.left = (int)oldPos.x; 
+	affectedChunks.left = (int)oldPos.x;
 	affectedChunks.top = (int)oldPos.y;
-	affectedChunks.width = (int)newPos.x; 
+	affectedChunks.width = (int)newPos.x;
 	affectedChunks.height = (int)newPos.y;
 
 	affectedChunks = sortVertices(affectedChunks);
@@ -132,7 +132,7 @@ void Canvas::plotLine()
 	affectedChunks.top = globalPosToChunkIndex({0, (int)affectedChunks.top-(int)strokeSize/2}).y;
 	affectedChunks.width = globalPosToChunkIndex({(int)affectedChunks.width+(int)strokeSize/2, 0}).x;
 	affectedChunks.height = globalPosToChunkIndex({0, (int)affectedChunks.height+(int)strokeSize/2}).y;
-	
+
 	// generate chunks if necessary
 	for (int y = affectedChunks.top; y <= affectedChunks.height; y++)
 		for (int x = affectedChunks.left; x <= affectedChunks.width; x++) {
@@ -141,7 +141,7 @@ void Canvas::plotLine()
 			if (!chunks.contains(key))
 				chunks.emplace(key, sf::Vector2i{x, y});
 		}
-	
+
 	// draw line
 	setPoint({(int)newPos.x, (int)newPos.y});
 	if (std::abs(oldPos.y - newPos.y) < std::abs(oldPos.x - newPos.x)) {
@@ -171,7 +171,7 @@ void Canvas::setPoint(sf::Vector2i pos)
 
 	pos.x -= strokeSize/2;
 	pos.y -= strokeSize/2;
-	
+
 	struct QueuedChunk {
 		sf::Vector2i index;
 		Chunk *chunk;
@@ -188,7 +188,7 @@ void Canvas::setPoint(sf::Vector2i pos)
 
 		return nullptr;
 	};
-	
+
 	// reduce nested loops to single loops?
 	for (int y = 0; y < strokeSize; y++)
 		for (int x = 0; x < strokeSize; x++) {
@@ -204,7 +204,7 @@ void Canvas::setPoint(sf::Vector2i pos)
 			auto *cell = fetchCell(index);
 			cell->chunk->setPixel(globalPosToChunkLocalPos({pos.x+x, pos.y+y}));
 		}
-	
+
 }
 
 void Canvas::update(sf::Vector2f mpos)

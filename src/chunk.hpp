@@ -19,8 +19,8 @@ private:
 public:
 	void setPixel(sf::Vector2u pos);
 	void updateTexture();
-	constexpr bool isDirty() {return dirty;}
-	constexpr sf::Vector2i &getIndex() {return index;}
+	inline bool isDirty() {return dirty;}
+	inline sf::Vector2i getIndex() {return index;}
 
 	Chunk(sf::Vector2i index);
 	Chunk(const Chunk &obj) = delete;
