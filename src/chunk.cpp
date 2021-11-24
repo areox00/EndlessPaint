@@ -6,8 +6,8 @@ Chunk::Chunk(sf::Vector2i index)
 	texture.create(256, 256);
 	pixels.create(256, 256);
 
-	for (size_t y = 0; y < 256; y++)
-		for (size_t x = 0; x < 256; x++) {
+	for (unsigned int y = 0; y < 256; y++)
+		for (unsigned int x = 0; x < 256; x++) {
 			pixels.setPixel(x, y, sf::Color::Black);
 		}
 
