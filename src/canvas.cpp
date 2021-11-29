@@ -11,8 +11,8 @@ constexpr int modulo(int x, int n)
 
 inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
 {
-	int x = (pos.x + (pos.x < 0)) / 256;
-	int y = (pos.y + (pos.y < 0)) / 256;
+	int x = (pos.x + (pos.x < 0)) / 512;
+	int y = (pos.y + (pos.y < 0)) / 512;
 
 	x -= pos.x < 0;
 	y -= pos.y < 0;
@@ -22,8 +22,8 @@ inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
 
 inline sf::Vector2u globalPosToChunkLocalPos(sf::Vector2i pos)
 {
-	int x = modulo(pos.x, 256);
-	int y = modulo(pos.y, 256);
+	int x = modulo(pos.x, 512);
+	int y = modulo(pos.y, 512);
 
 	return {(unsigned int)x, (unsigned int)y};
 }
@@ -158,7 +158,7 @@ void Canvas::plotLine()
 	}
 
 	// check that chunk is actually dirty and update dirty chunks texture
-	for (auto &&i : dirtyChunks) {
+	for (const auto &i : dirtyChunks) {
 		Chunk &chunk = chunks.at(i);
 		if (chunk.isDirty())
 			chunk.updateTexture();
@@ -180,8 +180,8 @@ void Canvas::setPoint(sf::Vector2i pos)
 	std::vector<QueuedChunk> affectedChunks;
 
 	auto fetchCell = [&](sf::Vector2i index) -> QueuedChunk * {
-		for(auto &&cell : affectedChunks) {
-			if(cell.index == index) {
+		for (auto &cell : affectedChunks) {
+			if (cell.index == index) {
 				return &cell;
 			}
 		}
@@ -190,21 +190,20 @@ void Canvas::setPoint(sf::Vector2i pos)
 	};
 
 	// reduce nested loops to single loops?
-	for (int y = 0; y < strokeSize; y++)
-		for (int x = 0; x < strokeSize; x++) {
-			auto index = globalPosToChunkIndex({pos.x+x, pos.y+y});
+	for (unsigned int y = 0; y < strokeSize; y++)
+		for (unsigned int x = 0; x < strokeSize; x++) {
+			auto index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
 			if (fetchCell(index) == nullptr) {
 				affectedChunks.emplace_back(index, &chunks.at(chunkIndexToHashmapKey(index)));
 			}
 		}
 
-	for (int y = 0; y < strokeSize; y++)
-		for (int x = 0; x < strokeSize; x++) {
-			sf::Vector2i index = globalPosToChunkIndex({pos.x+x, pos.y+y});
+	for (unsigned int y = 0; y < strokeSize; y++)
+		for (unsigned int x = 0; x < strokeSize; x++) {
+			sf::Vector2i index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
 			auto *cell = fetchCell(index);
-			cell->chunk->setPixel(globalPosToChunkLocalPos({pos.x+x, pos.y+y}));
+			cell->chunk->setPixel(globalPosToChunkLocalPos({int(pos.x+x), int(pos.y+y)}));
 		}
-
 }
 
 void Canvas::update(sf::Vector2f mpos)
@@ -224,6 +223,6 @@ void Canvas::update(sf::Vector2f mpos)
 
 void Canvas::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-	for (auto &&i : chunks)
+	for (const auto &i : chunks)
 		target.draw(i.second, states);
 }

@@ -8,11 +8,11 @@
 
 class Canvas : public sf::Drawable {
 private:
-	std::unordered_map<uint64_t, Chunk> chunks; 
+	std::unordered_map<uint64_t, Chunk> chunks;
 	std::vector<uint64_t> dirtyChunks;
 
 	sf::Vector2f oldPos, newPos = {0, 0};
-	unsigned int strokeSize = 16;
+	unsigned int strokeSize = 64;
 
 	void plotLineLow(sf::Vector2f start, sf::Vector2f end);
 	void plotLineHigh(sf::Vector2f start, sf::Vector2f end);
