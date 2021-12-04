@@ -17,7 +17,8 @@ private:
 	void plotLineLow(sf::Vector2f start, sf::Vector2f end);
 	void plotLineHigh(sf::Vector2f start, sf::Vector2f end);
 	void plotLine();
-	void setPoint(sf::Vector2i pos);
+	void setPointFull(sf::Vector2i pos);
+	void setPointOutline(sf::Vector2i pos);
 	void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 public:
 	Canvas();

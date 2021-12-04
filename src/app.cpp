@@ -4,7 +4,7 @@ App::App()
 {
 	sm.setState(new DrawingState(this));
 	window.create(sf::VideoMode(1280, 720), "asunapixel");
-	window.setFramerateLimit(0);
+	window.setFramerateLimit(60);
 }
 
 App::~App()
