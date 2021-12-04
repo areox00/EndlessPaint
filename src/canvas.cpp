@@ -11,8 +11,8 @@ constexpr int modulo(int x, int n)
 
 inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
 {
-	int x = (pos.x + (pos.x < 0)) / 256;
-	int y = (pos.y + (pos.y < 0)) / 256;
+	int x = (pos.x + (pos.x < 0)) / 512;
+	int y = (pos.y + (pos.y < 0)) / 512;
 
 	x -= pos.x < 0;
 	y -= pos.y < 0;
@@ -22,8 +22,8 @@ inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
 
 inline sf::Vector2u globalPosToChunkLocalPos(sf::Vector2i pos)
 {
-	int x = modulo(pos.x, 256);
-	int y = modulo(pos.y, 256);
+	int x = modulo(pos.x, 512);
+	int y = modulo(pos.y, 512);
 
 	return {(unsigned int)x, (unsigned int)y};
 }
@@ -73,7 +73,7 @@ void Canvas::plotLineLow(sf::Vector2f start, sf::Vector2f end)
 	int y = start.y;
 
 	for (int x = start.x; x < end.x; x++) {
-		setPoint({x, y});
+		setPointOutline({x, y});
 
 		if (D > 0) {
 			y = y + yi;
@@ -82,6 +82,7 @@ void Canvas::plotLineLow(sf::Vector2f start, sf::Vector2f end)
 		else
 			D = D + 2 * dy;
 	}
+	setPointFull({(int)end.x, y});
 }
 
 void Canvas::plotLineHigh(sf::Vector2f start, sf::Vector2f end)
@@ -99,7 +100,7 @@ void Canvas::plotLineHigh(sf::Vector2f start, sf::Vector2f end)
 	int x = start.x;
 
 	for (int y = start.y; y < end.y; y++) {
-		setPoint({x, y});
+		setPointOutline({x, y});
 
 		if (D > 0) {
 			x = x + xi;
@@ -108,15 +109,16 @@ void Canvas::plotLineHigh(sf::Vector2f start, sf::Vector2f end)
 		else
 			D = D + 2 * dx;
 	}
+	setPointFull({x, (int)end.y});
 }
 
 void Canvas::plotLine()
 {
 	// Bresenham's line algorithm
 	/*
-		uh well im drawing a rectangle around every pixel in line, it's not the best
-		way to achieve thickness effect but im sure that this wont be any performance problem,
-		anyway i have in mind to improve this somewhere in future
+		edit: I was wrong
+		now instead of drawing full rectangles, I'm drawing only outlines at every point in line
+		and full shape is drawn only at the end of the line
 	*/
 
 	sf::IntRect affectedChunks;
@@ -143,7 +145,7 @@ void Canvas::plotLine()
 		}
 
 	// draw line
-	setPoint({(int)newPos.x, (int)newPos.y});
+	setPointFull({(int)newPos.x, (int)newPos.y});
 	if (std::abs(oldPos.y - newPos.y) < std::abs(oldPos.x - newPos.x)) {
 		if (newPos.x > oldPos.x)
 			plotLineLow(oldPos, newPos);
@@ -158,14 +160,14 @@ void Canvas::plotLine()
 	}
 
 	// check that chunk is actually dirty and update dirty chunks texture
-	for (auto &&i : dirtyChunks) {
+	for (const auto &i : dirtyChunks) {
 		Chunk &chunk = chunks.at(i);
 		if (chunk.isDirty())
 			chunk.updateTexture();
 	}
 }
 
-void Canvas::setPoint(sf::Vector2i pos)
+void Canvas::setPointOutline(sf::Vector2i pos)
 {
 	// i feel like this is overcomplicated
 
@@ -180,8 +182,8 @@ void Canvas::setPoint(sf::Vector2i pos)
 	std::vector<QueuedChunk> affectedChunks;
 
 	auto fetchCell = [&](sf::Vector2i index) -> QueuedChunk * {
-		for(auto &&cell : affectedChunks) {
-			if(cell.index == index) {
+		for (auto &cell : affectedChunks) {
+			if (cell.index == index) {
 				return &cell;
 			}
 		}
@@ -189,22 +191,62 @@ void Canvas::setPoint(sf::Vector2i pos)
 		return nullptr;
 	};
 
-	// reduce nested loops to single loops?
-	for (int y = 0; y < strokeSize; y++)
-		for (int x = 0; x < strokeSize; x++) {
-			auto index = globalPosToChunkIndex({pos.x+x, pos.y+y});
+	for (unsigned int y = 0; y < strokeSize; y++)
+		for (unsigned int x = 0; x < strokeSize; x++) {
+			if (x == 0 || x == strokeSize-1 || y == 0 || y == strokeSize - 1) {
+				auto index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
+				if (fetchCell(index) == nullptr) {
+					affectedChunks.emplace_back(index, &chunks.at(chunkIndexToHashmapKey(index)));
+				}
+			}
+		}
+
+	for (unsigned int y = 0; y < strokeSize; y++)
+		for (unsigned int x = 0; x < strokeSize; x++) {
+			if (x == 0 || x == strokeSize - 1 || y == 0 || y == strokeSize - 1) {
+				sf::Vector2i index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
+				auto *cell = fetchCell(index);
+				cell->chunk->setPixel(globalPosToChunkLocalPos({int(pos.x+x), int(pos.y+y)}));
+			}
+		}
+}
+
+void Canvas::setPointFull(sf::Vector2i pos)
+{
+	pos.x -= strokeSize/2;
+	pos.y -= strokeSize/2;
+
+	struct QueuedChunk {
+		sf::Vector2i index;
+		Chunk *chunk;
+	};
+
+	std::vector<QueuedChunk> affectedChunks;
+
+	auto fetchCell = [&](sf::Vector2i index) -> QueuedChunk * {
+		for (auto &cell : affectedChunks) {
+			if (cell.index == index) {
+				return &cell;
+			}
+		}
+
+		return nullptr;
+	};
+
+	for (unsigned int y = 0; y < strokeSize; y++)
+		for (unsigned int x = 0; x < strokeSize; x++) {
+			auto index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
 			if (fetchCell(index) == nullptr) {
 				affectedChunks.emplace_back(index, &chunks.at(chunkIndexToHashmapKey(index)));
 			}
 		}
 
-	for (int y = 0; y < strokeSize; y++)
-		for (int x = 0; x < strokeSize; x++) {
-			sf::Vector2i index = globalPosToChunkIndex({pos.x+x, pos.y+y});
+	for (unsigned int y = 0; y < strokeSize; y++)
+		for (unsigned int x = 0; x < strokeSize; x++) {
+			sf::Vector2i index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
 			auto *cell = fetchCell(index);
-			cell->chunk->setPixel(globalPosToChunkLocalPos({pos.x+x, pos.y+y}));
+			cell->chunk->setPixel(globalPosToChunkLocalPos({int(pos.x+x), int(pos.y+y)}));
 		}
-
 }
 
 void Canvas::update(sf::Vector2f mpos)
@@ -224,6 +266,6 @@ void Canvas::update(sf::Vector2f mpos)
 
 void Canvas::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-	for (auto &&i : chunks)
+	for (const auto &i : chunks)
 		target.draw(i.second, states);
 }

@@ -3,17 +3,17 @@
 Chunk::Chunk(sf::Vector2i index)
 	: index(index)
 {
-	texture.create(256, 256);
-	pixels.create(256, 256);
+	texture.create(512, 512);
+	pixels.create(512, 512);
 
-	for (unsigned int y = 0; y < 256; y++)
-		for (unsigned int x = 0; x < 256; x++) {
+	for (unsigned int y = 0; y < 512; y++)
+		for (unsigned int x = 0; x < 512; x++) {
 			pixels.setPixel(x, y, sf::Color::Black);
 		}
 
 	texture.update(pixels);
 
-	sprite.setPosition({index.x*256.f, index.y*256.f});
+	sprite.setPosition({index.x*512.f, index.y*512.f});
 	sprite.setTexture(texture);
 }
 
