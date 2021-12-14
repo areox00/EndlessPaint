@@ -21,7 +21,7 @@ void StateManager::setState(State *state)
 	this->state = state;
 }
 
-State* StateManager::getState()
+State *StateManager::getState()
 {
 	return state;
 }

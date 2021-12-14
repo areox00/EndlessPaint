@@ -3,7 +3,7 @@
 #include <bit>
 #include <cmath>
 
-constexpr int modulo(int x, int n)
+inline int modulo(int x, int n)
 {
 	//return (x & n) + 1;
 	return (x % n + n) % n;
