@@ -71,3 +71,12 @@ void Viewport::processEvent(sf::Event &event)
 			break;
 	}
 }
+
+sf::IntRect Viewport::getBounds()
+{
+	int left = view.getCenter().x - view.getSize().x / 2.f;
+	int right = view.getCenter().x + view.getSize().x / 2.f;
+	int top = view.getCenter().y + view.getSize().y / 2.f;
+	int down = view.getCenter().y - view.getSize().y / 2.f;
+	printf("%d %d %d %d\n", left, right, top, down);
+}

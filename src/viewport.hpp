@@ -17,5 +17,6 @@ public:
 
 	void init(sf::RenderWindow *window);
 	void processEvent(sf::Event &event);
+	sf::IntRect getBounds();
 	inline const sf::View &getView() {return view;}
 };

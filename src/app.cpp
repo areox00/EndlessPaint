@@ -23,7 +23,7 @@ void App::processEvent()
 void App::update()
 {
 	dt = clock.restart().asSeconds();
-	printf("%f\n", 1/dt);
+
 	pixelPos = sf::Mouse::getPosition(window);
 	worldPos = window.mapPixelToCoords(pixelPos);
 
