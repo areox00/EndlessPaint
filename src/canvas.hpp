@@ -25,5 +25,5 @@ public:
 	Canvas();
 	~Canvas();
 
-	void update(sf::Vector2f mpos);
+	void update(sf::Vector2f mpos, sf::IntRect bounds);
 };
