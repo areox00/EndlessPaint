@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#define CHUNK_SIZE 512
+
 class Chunk : public sf::Drawable {
 private:
 	sf::Texture texture;

@@ -3,16 +3,16 @@
 #include <bit>
 #include <cmath>
 
-inline int modulo(int x, int n)
+static inline int modulo(int x, int n)
 {
 	//return (x & n) + 1;
 	return (x % n + n) % n;
 }
 
-inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
+static inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
 {
-	int x = (pos.x + (pos.x < 0)) / 512;
-	int y = (pos.y + (pos.y < 0)) / 512;
+	int x = (pos.x + (pos.x < 0)) / CHUNK_SIZE;
+	int y = (pos.y + (pos.y < 0)) / CHUNK_SIZE;
 
 	x -= pos.x < 0;
 	y -= pos.y < 0;
@@ -20,15 +20,15 @@ inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
 	return {x, y};
 }
 
-inline sf::Vector2u globalPosToChunkLocalPos(sf::Vector2i pos)
+static inline sf::Vector2u globalPosToChunkLocalPos(sf::Vector2i pos)
 {
-	int x = modulo(pos.x, 512);
-	int y = modulo(pos.y, 512);
+	int x = modulo(pos.x, CHUNK_SIZE);
+	int y = modulo(pos.y, CHUNK_SIZE);
 
 	return {(unsigned int)x, (unsigned int)y};
 }
 
-inline uint64_t chunkIndexToHashmapKey(sf::Vector2i index)
+static inline uint64_t chunkIndexToHashmapKey(sf::Vector2i index)
 {
 	uint32_t ux = std::bit_cast<uint32_t>(index.x);
 	uint32_t uy = std::bit_cast<uint32_t>(index.y);
@@ -38,7 +38,7 @@ inline uint64_t chunkIndexToHashmapKey(sf::Vector2i index)
 	return packed;
 }
 
-inline sf::IntRect sortVertices(const sf::IntRect &rect)
+static inline sf::IntRect sortVertices(const sf::IntRect &rect)
 {
 	int left = std::min(rect.left, rect.width);
 	int width = std::max(rect.left, rect.width);
@@ -249,7 +249,7 @@ void Canvas::setPointFull(sf::Vector2i pos)
 		}
 }
 
-void Canvas::update(sf::Vector2f mpos)
+void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds)
 {
 	oldPos = newPos;
 	newPos = mpos;

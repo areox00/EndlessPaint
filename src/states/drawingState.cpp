@@ -22,7 +22,7 @@ void DrawingState::processEvent(sf::Event &event)
 
 void DrawingState::update()
 {
-	canvas.update(app->worldPos);
+	canvas.update(app->worldPos, viewport.getBounds());
 }
 
 void DrawingState::draw(float alpha)
