@@ -48,6 +48,16 @@ static inline sf::IntRect sortVertices(const sf::IntRect &rect)
 	return {left, top, width, height};
 }
 
+static inline sf::IntRect rectToChunkIndex(const sf::IntRect &rect)
+{
+	int left = globalPosToChunkIndex({rect.left, 0}).x;
+	int top = globalPosToChunkIndex({0, rect.top}).y;
+	int width = globalPosToChunkIndex({rect.width, 0}).x;
+	int height = globalPosToChunkIndex({0, rect.height}).y;
+
+	return {left, top, width, height};
+}
+
 Canvas::Canvas()
 {
 
@@ -130,10 +140,12 @@ void Canvas::plotLine()
 
 	affectedChunks = sortVertices(affectedChunks);
 
-	affectedChunks.left = globalPosToChunkIndex({(int)affectedChunks.left-(int)strokeSize/2, 0}).x;
-	affectedChunks.top = globalPosToChunkIndex({0, (int)affectedChunks.top-(int)strokeSize/2}).y;
-	affectedChunks.width = globalPosToChunkIndex({(int)affectedChunks.width+(int)strokeSize/2, 0}).x;
-	affectedChunks.height = globalPosToChunkIndex({0, (int)affectedChunks.height+(int)strokeSize/2}).y;
+	affectedChunks = rectToChunkIndex({
+		affectedChunks.left-strokeSize/2,
+		affectedChunks.top-strokeSize/2,
+		affectedChunks.width+strokeSize/2,
+		affectedChunks.height+strokeSize/2
+	});
 
 	// generate chunks if necessary
 	for (int y = affectedChunks.top; y <= affectedChunks.height; y++)
@@ -256,7 +268,7 @@ void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds)
 
 	printf("%d %d\n", globalPosToChunkIndex({mpos.x, mpos.y}).x, globalPosToChunkIndex({mpos.x, mpos.y}).y);
 
-	//bounds = sortVertices(bounds);
+	bounds = rectToChunkIndex(bounds);
 
 	printf("%d %d %d %d\n", bounds.left, bounds.width, bounds.top, bounds.height);
 
