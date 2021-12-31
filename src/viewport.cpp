@@ -75,9 +75,9 @@ void Viewport::processEvent(sf::Event &event)
 const sf::IntRect Viewport::getBounds()
 {
 	int left = view.getCenter().x - view.getSize().x / 2.f;
-	int right = view.getCenter().x + view.getSize().x / 2.f;
+	int width = view.getCenter().x + view.getSize().x / 2.f;
 	int top = view.getCenter().y + view.getSize().y / 2.f;
-	int down = view.getCenter().y - view.getSize().y / 2.f;
+	int height = view.getCenter().y - view.getSize().y / 2.f;
 
-	return {left, right, top, down};
+	return {left, top, width, height};
 }

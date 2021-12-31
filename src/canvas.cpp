@@ -254,6 +254,12 @@ void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds)
 	oldPos = newPos;
 	newPos = mpos;
 
+	printf("%d %d\n", globalPosToChunkIndex({mpos.x, mpos.y}).x, globalPosToChunkIndex({mpos.x, mpos.y}).y);
+
+	//bounds = sortVertices(bounds);
+
+	printf("%d %d %d %d\n", bounds.left, bounds.width, bounds.top, bounds.height);
+
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 		plotLine();
 	}
