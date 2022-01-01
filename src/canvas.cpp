@@ -249,12 +249,12 @@ void Canvas::setPointFull(sf::Vector2i pos)
 		}
 }
 
-void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds)
+void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds, bool canPaint)
 {
 	oldPos = newPos;
 	newPos = mpos;
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && canPaint) {
 		plotLine();
 	}
 

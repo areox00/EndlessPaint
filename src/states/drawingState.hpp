@@ -8,6 +8,7 @@ class DrawingState : public State {
 private:
 	Canvas canvas;
 	Viewport viewport;
+	bool canPaint = true;
 public:
 	DrawingState(App *app);
 	~DrawingState();

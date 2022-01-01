@@ -14,15 +14,26 @@ DrawingState::~DrawingState()
 
 void DrawingState::processEvent(sf::Event &event)
 {
-	if (event.type == sf::Event::Closed)
-		app->window.close();
+	switch (event.type) {
+		case sf::Event::Closed: 
+			app->window.close(); 
+			break;
+		case sf::Event::LostFocus: 
+			canPaint = false; 
+			break;
+		case sf::Event::GainedFocus: 
+			canPaint = true; 
+			break;
+		default:
+			break;
+	}
 
 	viewport.processEvent(event);
 }
 
 void DrawingState::update()
 {
-	canvas.update(app->worldPos, viewport.getBounds());
+	canvas.update(app->worldPos, viewport.getBounds(), canPaint);
 }
 
 void DrawingState::draw(float alpha)
