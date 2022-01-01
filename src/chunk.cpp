@@ -3,7 +3,7 @@
 Chunk::Chunk(sf::Vector2i index)
 	: index(index)
 {
-	pixels.create(CHUNK_SIZE, CHUNK_SIZE, sf::Color::Black);
+	pixels.create(CHUNK_SIZE, CHUNK_SIZE, sf::Color::White);
 	texture.create(CHUNK_SIZE, CHUNK_SIZE);
 
 	texture.update(pixels);
@@ -15,6 +15,17 @@ Chunk::Chunk(sf::Vector2i index)
 Chunk::~Chunk()
 {
 
+}
+
+bool Chunk::isVisible(const sf::IntRect &bounds) const
+{
+	if (sprite.getPosition().x <= bounds.width &&
+	    sprite.getPosition().x >= bounds.left - CHUNK_SIZE &&
+		sprite.getPosition().y <= bounds.top &&
+		sprite.getPosition().y >= bounds.height - CHUNK_SIZE) {
+			return true;
+		}
+	return false;
 }
 
 void Chunk::setPixel(sf::Vector2u pos)

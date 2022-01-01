@@ -18,7 +18,7 @@ src = [
 
 if host_machine.system() == 'linux'
     if get_option('buildtype').startswith('debug')
-        add_project_arguments(['-g', '-DDEBUG'], language : 'cpp')
+        add_project_arguments(['-DDEBUG'], language : 'cpp')
         add_project_link_arguments(['-lbfd', '-ldl'], language : 'cpp')
     endif
 endif

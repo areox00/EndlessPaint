@@ -141,10 +141,10 @@ void Canvas::plotLine()
 	affectedChunks = sortVertices(affectedChunks);
 
 	affectedChunks = rectToChunkIndex({
-		affectedChunks.left-strokeSize/2,
-		affectedChunks.top-strokeSize/2,
-		affectedChunks.width+strokeSize/2,
-		affectedChunks.height+strokeSize/2
+		affectedChunks.left - (int)strokeSize/2,
+		affectedChunks.top - (int)strokeSize/2,
+		affectedChunks.width + (int)strokeSize/2,
+		affectedChunks.height + (int)strokeSize/2
 	});
 
 	// generate chunks if necessary
@@ -177,6 +177,7 @@ void Canvas::plotLine()
 		if (chunk.isDirty())
 			chunk.updateTexture();
 	}
+	dirtyChunks.clear();
 }
 
 void Canvas::setPointOutline(sf::Vector2i pos)
@@ -266,19 +267,37 @@ void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds)
 	oldPos = newPos;
 	newPos = mpos;
 
-	printf("%d %d\n", globalPosToChunkIndex({mpos.x, mpos.y}).x, globalPosToChunkIndex({mpos.x, mpos.y}).y);
+	oldBounds = newBounds;
+	newBounds = rectToChunkIndex(bounds);
+	
+	sf::IntRect diff = {
+		newBounds.left - oldBounds.left,
+		newBounds.width - oldBounds.width,
+		newBounds.top - oldBounds.top,
+		newBounds.height - oldBounds.height,
+	};
 
-	bounds = rectToChunkIndex(bounds);
+	std::vector<uint64_t> invisibleChunks;
 
-	printf("%d %d %d %d\n", bounds.left, bounds.width, bounds.top, bounds.height);
+	// very lazy method
+	if (diff.left != 0 || diff.width != 0 ||
+	    diff.top != 0 || diff.height != 0) {
+			for (const auto &i : chunks) {
+				if (!i.second.isVisible(bounds)) {
+					invisibleChunks.emplace_back(chunkIndexToHashmapKey(i.second.getIndex()));
+				}
+			}
+			for (const auto &i : invisibleChunks) {
+				chunks.erase(i);
+			}
+			invisibleChunks.clear();
+		}
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 		plotLine();
 	}
-
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
 		chunks.clear();
-		dirtyChunks.clear();
 	}
 }
 

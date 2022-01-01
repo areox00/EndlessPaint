@@ -13,7 +13,8 @@ private:
 	std::vector<uint64_t> dirtyChunks;
 
 	sf::Vector2f oldPos, newPos = {0, 0};
-	unsigned int strokeSize = 32;
+	sf::IntRect oldBounds, newBounds = {0, 0, 0, 0};
+	unsigned int strokeSize = 8;
 
 	void plotLineLow(sf::Vector2f start, sf::Vector2f end);
 	void plotLineHigh(sf::Vector2f start, sf::Vector2f end);

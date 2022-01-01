@@ -16,8 +16,10 @@ private:
 public:
 	void setPixel(sf::Vector2u pos);
 	void updateTexture();
-	inline bool isDirty() {return dirty;}
-	inline sf::Vector2i getIndex() {return index;}
+	inline bool isDirty() const { return dirty; }
+	inline sf::Vector2i getIndex() const { return index; }
+	inline const sf::Uint8 *getPixelData() const { return pixels.getPixelsPtr(); }
+	bool isVisible(const sf::IntRect &bounds) const;
 
 	Chunk(sf::Vector2i index);
 	Chunk(const Chunk &obj) = delete;
