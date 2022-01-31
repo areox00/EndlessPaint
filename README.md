@@ -19,4 +19,4 @@ ninja -C build
 ./build/asunapixel
 ```
 Instructions for building on windows available here:
-[building-on-windows.md](./docs/building-on-windows)
+[building-on-windows.md](./docs/building-on-windows.md)
