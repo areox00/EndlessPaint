@@ -33,7 +33,7 @@ ninja -C build
 - Go into the command line
 - Change the directory to the `asunapixel`'s one
 - Build and run with the builder tool:
-	- `./builer -br` in powershell
+	- `./builder -br` in powershell
 	- `builder -br` in cmd
 - Alternatively build and run on your own:
 	- Prebuild with `meson build --buildtype=release`
