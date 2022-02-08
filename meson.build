@@ -23,4 +23,4 @@ if host_machine.system() == 'linux'
     endif
 endif
 
-executable('asunapixel', src, dependencies : deps)
+executable('asunapixel', src, include_directories : 'src', dependencies : deps)

@@ -1,53 +1,5 @@
 #include "canvas.hpp"
 
-#include <bit>
-#include <cmath>
-
-static inline int modulo(int x, int n)
-{
-	//return (x & n) + 1;
-	return (x % n + n) % n;
-}
-
-static inline sf::Vector2i globalPosToChunkIndex(sf::Vector2i pos)
-{
-	int x = (pos.x + (pos.x < 0)) / CHUNK_SIZE;
-	int y = (pos.y + (pos.y < 0)) / CHUNK_SIZE;
-
-	x -= pos.x < 0;
-	y -= pos.y < 0;
-
-	return {x, y};
-}
-
-static inline sf::Vector2u globalPosToChunkLocalPos(sf::Vector2i pos)
-{
-	int x = modulo(pos.x, CHUNK_SIZE);
-	int y = modulo(pos.y, CHUNK_SIZE);
-
-	return {(unsigned int)x, (unsigned int)y};
-}
-
-static inline uint64_t chunkIndexToHashmapKey(sf::Vector2i index)
-{
-	uint32_t ux = std::bit_cast<uint32_t>(index.x);
-	uint32_t uy = std::bit_cast<uint32_t>(index.y);
-
-	uint64_t packed = ((uint64_t)ux << 32) | ((uint64_t)uy);
-
-	return packed;
-}
-
-static inline sf::IntRect sortVertices(const sf::IntRect &rect)
-{
-	int left = std::min(rect.left, rect.width);
-	int width = std::max(rect.left, rect.width);
-	int top = std::min(rect.top, rect.height);
-	int height = std::max(rect.top, rect.height);
-
-	return {left, top, width, height};
-}
-
 Canvas::Canvas()
 {
 
@@ -58,10 +10,10 @@ Canvas::~Canvas()
 
 }
 
-void Canvas::plotLineLow(sf::Vector2f start, sf::Vector2f end)
+void Canvas::plotLineLow(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
-	int dx = end.x - start.x;
-	int dy = end.y - start.y;
+	int dx = x2 - x1;
+	int dy = y2 - y1;
 	int yi = 1;
 
 	if (dy < 0) {
@@ -70,9 +22,9 @@ void Canvas::plotLineLow(sf::Vector2f start, sf::Vector2f end)
 	}
 
 	int D = (2 * dy) - dx;
-	int y = start.y;
+	int y = y1;
 
-	for (int x = start.x; x < end.x; x++) {
+	for (int x = x1; x < x2; x++) {
 		setPointOutline({x, y});
 
 		if (D > 0) {
@@ -82,13 +34,13 @@ void Canvas::plotLineLow(sf::Vector2f start, sf::Vector2f end)
 		else
 			D = D + 2 * dy;
 	}
-	setPointFull({(int)end.x, y});
+	setPointFull({x2, y});
 }
 
-void Canvas::plotLineHigh(sf::Vector2f start, sf::Vector2f end)
+void Canvas::plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
-	int dx = end.x - start.x;
-	int dy = end.y - start.y;
+	int dx = x2 - x1;
+	int dy = y2 - y1;
 	int xi = 1;
 
 	if (dx < 0) {
@@ -97,9 +49,9 @@ void Canvas::plotLineHigh(sf::Vector2f start, sf::Vector2f end)
 	}
 
 	int D = (2 * dx) - dy;
-	int x = start.x;
+	int x = x1;
 
-	for (int y = start.y; y < end.y; y++) {
+	for (int y = y1; y < y2; y++) {
 		setPointOutline({x, y});
 
 		if (D > 0) {
@@ -109,7 +61,7 @@ void Canvas::plotLineHigh(sf::Vector2f start, sf::Vector2f end)
 		else
 			D = D + 2 * dx;
 	}
-	setPointFull({x, (int)end.y});
+	setPointFull({x, y2});
 }
 
 void Canvas::plotLine()
@@ -120,152 +72,83 @@ void Canvas::plotLine()
 		now instead of drawing full rectangles, I'm drawing only outlines at every point in line
 		and full shape is drawn only at the end of the line
 	*/
-
 	sf::IntRect affectedChunks;
 
-	affectedChunks.left = (int)oldPos.x;
-	affectedChunks.top = (int)oldPos.y;
-	affectedChunks.width = (int)newPos.x;
-	affectedChunks.height = (int)newPos.y;
+	affectedChunks.left = oldPos.x;
+	affectedChunks.top =  oldPos.y;
+	affectedChunks.width = newPos.x;
+	affectedChunks.height = newPos.y;
 
 	affectedChunks = sortVertices(affectedChunks);
 
-	affectedChunks.left = globalPosToChunkIndex({(int)affectedChunks.left-(int)strokeSize/2, 0}).x;
-	affectedChunks.top = globalPosToChunkIndex({0, (int)affectedChunks.top-(int)strokeSize/2}).y;
-	affectedChunks.width = globalPosToChunkIndex({(int)affectedChunks.width+(int)strokeSize/2, 0}).x;
-	affectedChunks.height = globalPosToChunkIndex({0, (int)affectedChunks.height+(int)strokeSize/2}).y;
+	GlobalPosition leftUp = {affectedChunks.left - (int)strokeSize, affectedChunks.top - (int)strokeSize};
+	GlobalPosition rightDown = {affectedChunks.width + (int)strokeSize, affectedChunks.height + (int)strokeSize};
 
-	// generate chunks if necessary
-	for (int y = affectedChunks.top; y <= affectedChunks.height; y++)
-		for (int x = affectedChunks.left; x <= affectedChunks.width; x++) {
-			uint64_t key = chunkIndexToHashmapKey({x, y});
-			dirtyChunks.emplace_back(key);
-			if (!chunks.contains(key))
-				chunks.emplace(key, sf::Vector2i{x, y});
+	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
+		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
+			auto key = ChunkIndex(x, y).mapKey().key;
+
+			chunks.try_emplace(key);
+			chunksTextures[key].create(CHUNK_SIZE, CHUNK_SIZE);
+			chunksSprites[key].setTexture(chunksTextures[key]);
+
+			chunksSprites[key].setPosition(x * CHUNK_SIZE, y * CHUNK_SIZE);
 		}
-
-	// draw line
-	setPointFull({(int)newPos.x, (int)newPos.y});
+	
+	setPointFull(newPos);
 	if (std::abs(oldPos.y - newPos.y) < std::abs(oldPos.x - newPos.x)) {
 		if (newPos.x > oldPos.x)
-			plotLineLow(oldPos, newPos);
+			plotLineLow(oldPos.x, oldPos.y, newPos.x, newPos.y);
 		else
-		 	plotLineLow(newPos, oldPos);
+		 	plotLineLow(newPos.x, newPos.y, oldPos.x, oldPos.y);
 	}
 	else {
 		if (newPos.y > oldPos.y)
-			plotLineHigh(oldPos, newPos);
+			plotLineHigh(oldPos.x, oldPos.y, newPos.x, newPos.y);
 		else
-			plotLineHigh(newPos, oldPos);
+			plotLineHigh(newPos.x, newPos.y, oldPos.x, oldPos.y);
 	}
 
-	// check that chunk is actually dirty and update dirty chunks texture
-	for (const auto &i : dirtyChunks) {
-		Chunk &chunk = chunks.at(i);
-		if (chunk.isDirty())
-			chunk.updateTexture();
-	}
+	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
+		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
+			auto key = ChunkIndex(x, y).mapKey().key;
+			chunksTextures[key].update(chunks[key].getPixels());
+		}
 }
 
-void Canvas::setPointOutline(sf::Vector2i pos)
+void Canvas::setPointOutline(GlobalPosition pos)
 {
-	// i feel like this is overcomplicated
-
-	pos.x -= strokeSize/2;
-	pos.y -= strokeSize/2;
-
-	struct QueuedChunk {
-		sf::Vector2i index;
-		Chunk *chunk;
-	};
-
-	std::vector<QueuedChunk> affectedChunks;
-
-	auto fetchCell = [&](sf::Vector2i index) -> QueuedChunk * {
-		for (auto &cell : affectedChunks) {
-			if (cell.index == index) {
-				return &cell;
-			}
-		}
-
-		return nullptr;
-	};
-
-	for (unsigned int y = 0; y < strokeSize; y++)
-		for (unsigned int x = 0; x < strokeSize; x++) {
-			if (x == 0 || x == strokeSize-1 || y == 0 || y == strokeSize - 1) {
-				auto index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
-				if (fetchCell(index) == nullptr) {
-					affectedChunks.emplace_back(index, &chunks.at(chunkIndexToHashmapKey(index)));
-				}
-			}
-		}
-
-	for (unsigned int y = 0; y < strokeSize; y++)
+	for (unsigned int y = 0; y < strokeSize; y++) 
 		for (unsigned int x = 0; x < strokeSize; x++) {
 			if (x == 0 || x == strokeSize - 1 || y == 0 || y == strokeSize - 1) {
-				sf::Vector2i index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
-				auto *cell = fetchCell(index);
-				cell->chunk->setPixel(globalPosToChunkLocalPos({int(pos.x+x), int(pos.y+y)}));
+				auto finalPos = GlobalPosition(pos.x + x - (pos.x < 0), pos.y + y - (pos.y < 0));
+				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
 			}
 		}
 }
 
-void Canvas::setPointFull(sf::Vector2i pos)
+void Canvas::setPointFull(GlobalPosition pos)
 {
-	pos.x -= strokeSize/2;
-	pos.y -= strokeSize/2;
-
-	struct QueuedChunk {
-		sf::Vector2i index;
-		Chunk *chunk;
-	};
-
-	std::vector<QueuedChunk> affectedChunks;
-
-	auto fetchCell = [&](sf::Vector2i index) -> QueuedChunk * {
-		for (auto &cell : affectedChunks) {
-			if (cell.index == index) {
-				return &cell;
-			}
-		}
-
-		return nullptr;
-	};
-
-	for (unsigned int y = 0; y < strokeSize; y++)
+	for (unsigned int y = 0; y < strokeSize; y++) 
 		for (unsigned int x = 0; x < strokeSize; x++) {
-			auto index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
-			if (fetchCell(index) == nullptr) {
-				affectedChunks.emplace_back(index, &chunks.at(chunkIndexToHashmapKey(index)));
-			}
-		}
-
-	for (unsigned int y = 0; y < strokeSize; y++)
-		for (unsigned int x = 0; x < strokeSize; x++) {
-			sf::Vector2i index = globalPosToChunkIndex({int(pos.x+x), int(pos.y+y)});
-			auto *cell = fetchCell(index);
-			cell->chunk->setPixel(globalPosToChunkLocalPos({int(pos.x+x), int(pos.y+y)}));
+			auto finalPos = GlobalPosition(pos.x + x - (pos.x < 0), pos.y + y - (pos.y < 0));
+			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
 		}
 }
 
 void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds, bool canPaint)
 {
 	oldPos = newPos;
-	newPos = mpos;
+	newPos = GlobalPosition(mpos.x, mpos.y);
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && canPaint) {
 		plotLine();
 	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
-		chunks.clear();
-		dirtyChunks.clear();
-	}
 }
 
-void Canvas::draw(sf::RenderTarget &target, sf::RenderStates states) const
+void Canvas::draw(sf::RenderTarget &target) 
 {
-	for (const auto &i : chunks)
-		target.draw(i.second, states);
+	for (const auto &i : chunksSprites) {
+		target.draw(i.second);
+	}
 }

@@ -1,5 +1,5 @@
 #include "drawingState.hpp"
-#include "../app.hpp"
+#include "app.hpp"
 
 DrawingState::DrawingState(App *app)
 	: State(app)
@@ -14,6 +14,8 @@ DrawingState::~DrawingState()
 
 void DrawingState::processEvent(sf::Event &event)
 {
+	viewport.processEvent(event);
+
 	switch (event.type) {
 		case sf::Event::Closed: 
 			app->window.close(); 
@@ -28,7 +30,6 @@ void DrawingState::processEvent(sf::Event &event)
 			break;
 	}
 
-	viewport.processEvent(event);
 }
 
 void DrawingState::update()
@@ -39,5 +40,5 @@ void DrawingState::update()
 void DrawingState::draw(float alpha)
 {
 	app->window.setView(viewport.getView());
-	app->window.draw(canvas);
+	canvas.draw(app->window);
 }
