@@ -1,8 +1,8 @@
 #pragma once
 
 #include "state.hpp"
-#include "../canvas.hpp"
-#include "../viewport.hpp"
+#include "canvas.hpp"
+#include "viewport.hpp"
 
 class DrawingState : public State {
 private:

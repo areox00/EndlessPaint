@@ -6,24 +6,27 @@
 #include <cstdint>
 #include "chunk.hpp"
 #include "viewport.hpp"
+#include "types.hpp"
 
-class Canvas : public sf::Drawable {
+class Canvas {
 private:
+	// maybe implement std::hash for MapKey?
 	std::unordered_map<uint64_t, Chunk> chunks;
-	std::vector<uint64_t> dirtyChunks;
+	std::unordered_map<uint64_t, sf::Texture> chunksTextures;
+	std::unordered_map<uint64_t, sf::Sprite> chunksSprites;
 
-	sf::Vector2f oldPos, newPos = {0, 0};
-	unsigned int strokeSize = 32;
+	GlobalPosition oldPos, newPos;
+	unsigned int strokeSize = 1;
 
-	void plotLineLow(sf::Vector2f start, sf::Vector2f end);
-	void plotLineHigh(sf::Vector2f start, sf::Vector2f end);
+	void plotLineLow(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
+	void plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 	void plotLine();
-	void setPointFull(sf::Vector2i pos);
-	void setPointOutline(sf::Vector2i pos);
-	void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+	void setPointFull(GlobalPosition pos);
+	void setPointOutline(GlobalPosition pos);
 public:
 	Canvas();
 	~Canvas();
 
+	void draw(sf::RenderTarget &target);
 	void update(sf::Vector2f mpos, sf::IntRect bounds, bool canPaint);
 };

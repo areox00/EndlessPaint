@@ -1,25 +1,13 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "types.hpp"
 
-#define CHUNK_SIZE 512
-
-class Chunk : public sf::Drawable {
+class Chunk {
 private:
-	sf::Texture texture;
-	sf::Sprite sprite;
-	sf::Image pixels;
-	sf::Vector2i index;
-	bool dirty = false;
-
-	void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+	sf::Uint8 pixels[CHUNK_SIZE * CHUNK_SIZE * 4];
 public:
-	void setPixel(sf::Vector2u pos);
-	void updateTexture();
-	inline bool isDirty() {return dirty;}
-	inline sf::Vector2i getIndex() {return index;}
-
-	Chunk(sf::Vector2i index);
-	Chunk(const Chunk &obj) = delete;
-	~Chunk();
+	// force inline this later
+	sf::Uint8 *getPixels();
+	void setPixel(PositionInChunk pos, sf::Color color);
 };
