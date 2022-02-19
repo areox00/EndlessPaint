@@ -16,7 +16,7 @@ private:
 	std::unordered_map<uint64_t, sf::Sprite> chunksSprites;
 
 	GlobalPosition oldPos, newPos;
-	unsigned int strokeSize = 1;
+	uint8_t strokeSize = 1;
 
 	void plotLineLow(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 	void plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2);

@@ -66,12 +66,12 @@ void Canvas::plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 
 void Canvas::plotLine()
 {
-	// Bresenham's line algorithm
-	/*
-		edit: I was wrong
-		now instead of drawing full rectangles, I'm drawing only outlines at every point in line
-		and full shape is drawn only at the end of the line
-	*/
+	/* Bresenham's line algorithm
+	 * edit: I was wrong
+	 * now instead of drawing full rectangles, I'm drawing only outlines at every point in line
+	 * and full shape is drawn only at the end of the line
+	 */
+
 	sf::IntRect affectedChunks;
 
 	affectedChunks.left = oldPos.x;
@@ -86,7 +86,7 @@ void Canvas::plotLine()
 
 	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
 		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
-			auto key = ChunkIndex(x, y).mapKey().key;
+			auto key = ChunkIndex{x, y}.mapKey().key;
 
 			chunks.try_emplace(key);
 			chunksTextures[key].create(CHUNK_SIZE, CHUNK_SIZE);
@@ -94,7 +94,7 @@ void Canvas::plotLine()
 
 			chunksSprites[key].setPosition(x * CHUNK_SIZE, y * CHUNK_SIZE);
 		}
-	
+
 	setPointFull(newPos);
 	if (std::abs(oldPos.y - newPos.y) < std::abs(oldPos.x - newPos.x)) {
 		if (newPos.x > oldPos.x)
@@ -111,17 +111,17 @@ void Canvas::plotLine()
 
 	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
 		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
-			auto key = ChunkIndex(x, y).mapKey().key;
+			auto key = ChunkIndex{x, y}.mapKey().key;
 			chunksTextures[key].update(chunks[key].getPixels());
 		}
 }
 
 void Canvas::setPointOutline(GlobalPosition pos)
 {
-	for (unsigned int y = 0; y < strokeSize; y++) 
-		for (unsigned int x = 0; x < strokeSize; x++) {
+	for (uint8_t y = 0; y < strokeSize; y++)
+		for (uint8_t x = 0; x < strokeSize; x++) {
 			if (x == 0 || x == strokeSize - 1 || y == 0 || y == strokeSize - 1) {
-				auto finalPos = GlobalPosition(pos.x + x - (pos.x < 0), pos.y + y - (pos.y < 0));
+				auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
 				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
 			}
 		}
@@ -129,24 +129,27 @@ void Canvas::setPointOutline(GlobalPosition pos)
 
 void Canvas::setPointFull(GlobalPosition pos)
 {
-	for (unsigned int y = 0; y < strokeSize; y++) 
-		for (unsigned int x = 0; x < strokeSize; x++) {
-			auto finalPos = GlobalPosition(pos.x + x - (pos.x < 0), pos.y + y - (pos.y < 0));
+	for (uint8_t y = 0; y < strokeSize; y++)
+		for (uint8_t x = 0; x < strokeSize; x++) {
+			auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
 			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
 		}
 }
 
 void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds, bool canPaint)
 {
+	mpos.x -= (mpos.x < 0);
+	mpos.y -= (mpos.y < 0);
+
 	oldPos = newPos;
-	newPos = GlobalPosition(mpos.x, mpos.y);
+	newPos = GlobalPosition{(int32_t)mpos.x, (int32_t)mpos.y};
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && canPaint) {
 		plotLine();
 	}
 }
 
-void Canvas::draw(sf::RenderTarget &target) 
+void Canvas::draw(sf::RenderTarget &target)
 {
 	for (const auto &i : chunksSprites) {
 		target.draw(i.second);
