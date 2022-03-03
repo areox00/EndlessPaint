@@ -91,7 +91,6 @@ void Canvas::plotLine()
 			chunks.try_emplace(key);
 			chunksTextures[key].create(CHUNK_SIZE, CHUNK_SIZE);
 			chunksSprites[key].setTexture(chunksTextures[key]);
-
 			chunksSprites[key].setPosition(x * CHUNK_SIZE, y * CHUNK_SIZE);
 		}
 
@@ -113,6 +112,7 @@ void Canvas::plotLine()
 		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
 			auto key = ChunkIndex{x, y}.mapKey().key;
 			chunksTextures[key].update(chunks[key].getPixels());
+			chunksTextures[key].generateMipmap();
 		}
 }
 
