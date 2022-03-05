@@ -113,6 +113,7 @@ void Canvas::plotLine()
 		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
 			auto key = ChunkIndex{x, y}.mapKey().key;
 			chunksTextures[key].update(chunks[key].getPixels());
+			chunksTextures[key].generateMipmap();
 		}
 }
 

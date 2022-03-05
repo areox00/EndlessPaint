@@ -12,6 +12,8 @@ src = [
     'src/main.cpp',
     'src/viewport.cpp',
 
+    'src/gui/gui.cpp',
+
     'src/states/stateManager.cpp',
     'src/states/drawingState.cpp'
 ]
