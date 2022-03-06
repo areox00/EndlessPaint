@@ -2,18 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 
-enum AlignV {
-	TOP,
-	MIDDLE,
-	BOTTOM
-};
-
-enum AlignH {
-	LEFT,
-	CENTER,
-	RIGHT
-};
-
 enum Layout {
 	FREE,
 	HORIZONTAL,
@@ -39,6 +27,11 @@ public:
 	void begin(sf::Vector2u windowSize, Layout layout);
 	void pushBox(sf::Vector2f size, Layout layout);
 	void popBox();
+	bool hover(sf::Vector2f point);
+	bool pressed(sf::Vector2f point);
+	void resize(sf::Vector2f size);
+	void offset(sf::Vector2f offset);
 	void padding(sf::Vector2f pad);
+	void icon(sf::RenderWindow &window, sf::Texture &texture);
 	void fill(sf::RenderWindow &window, sf::Color color);
 };

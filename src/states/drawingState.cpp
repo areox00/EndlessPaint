@@ -44,25 +44,45 @@ void DrawingState::draw(float alpha)
 	sf::View guiView;
 	guiView.setCenter((sf::Vector2f)app->window.getSize() / 2.f);
 	guiView.setSize((sf::Vector2f)app->window.getSize());
-
+	//guiView.zoom(1.1);
 	app->window.setView(guiView);
 
+	sf::Vector2f guiPos = app->window.mapPixelToCoords(app->pixelPos);
+
 	gui.begin(app->window.getSize(), Layout::VERTICAL);
-	gui.padding({32, 32});
+
+	// empty space
+	gui.pushBox({gui.getSize().x, gui.getSize().y - 32}, Layout::VERTICAL);
+	gui.popBox();
+
+	// bottom bar
+	gui.pushBox({gui.getSize().x, gui.getRemainingSize().y}, Layout::FREE);
 	gui.fill(app->window, sf::Color::Black);
+	gui.padding({20.0, 0.0});
 
-	gui.pushBox({300, 100},Layout::HORIZONTAL);
-	gui.fill(app->window, sf::Color::Red);
+	std::vector<sf::Color> colors = {
+		sf::Color::Red,
+		sf::Color::Blue,
+		sf::Color::Green
+	};
 
-	gui.popBox();
+	for (const auto &color : colors) {
+		gui.pushBox({16.0, gui.getSize().y}, Layout::HORIZONTAL);
+		gui.offset({0, gui.getSize().y / 2.f});
 
-	gui.pushBox({200, 100}, Layout::VERTICAL);
-	gui.fill(app->window, sf::Color::Blue);
+		if (canvas.getStrokeColor() == color)
+			gui.offset({0, -6});
+		else {
+			if (gui.hover(guiPos))
+				gui.offset({0, -6});
 
-	gui.popBox();
+			if (gui.pressed(guiPos))
+				canvas.setStrokeColor(color);
+		}
 
-	gui.pushBox({100, 100}, Layout::VERTICAL);
-	gui.fill(app->window, sf::Color::Green);
+		gui.fill(app->window, color);
+		gui.popBox();
+	}
 
 	app->window.setView(viewport.getView());
 }

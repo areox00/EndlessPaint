@@ -123,7 +123,7 @@ void Canvas::setPointOutline(GlobalPosition pos)
 		for (uint8_t x = 0; x < strokeSize; x++) {
 			if (x == 0 || x == strokeSize - 1 || y == 0 || y == strokeSize - 1) {
 				auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
-				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
+				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), strokeColor);
 			}
 		}
 }
@@ -133,7 +133,7 @@ void Canvas::setPointFull(GlobalPosition pos)
 	for (uint8_t y = 0; y < strokeSize; y++)
 		for (uint8_t x = 0; x < strokeSize; x++) {
 			auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
-			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
+			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), strokeColor);
 		}
 }
 
@@ -155,4 +155,14 @@ void Canvas::draw(sf::RenderTarget &target)
 	for (const auto &i : chunksSprites) {
 		target.draw(i.second);
 	}
+}
+
+void Canvas::setStrokeColor(sf::Color color)
+{
+	strokeColor = color;
+}
+
+sf::Color Canvas::getStrokeColor()
+{
+	return strokeColor;
 }
