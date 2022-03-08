@@ -60,6 +60,8 @@ void DrawingState::draw(float alpha)
 	gui.fill(app->window, sf::Color::Black);
 	gui.padding({20.0, 0.0});
 
+	canPaint = !gui.hover(guiPos);
+
 	std::vector<sf::Color> colors = {
 		sf::Color::Red,
 		sf::Color::Blue,
