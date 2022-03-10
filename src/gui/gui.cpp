@@ -85,18 +85,6 @@ bool Gui::pressed(sf::Vector2f point)
 	return sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hover(point);
 }
 
-void Gui::resize(sf::Vector2f size)
-{
-	boxes.back().rect.width = size.x;
-	boxes.back().rect.height = size.y;
-}
-
-void Gui::offset(sf::Vector2f offset)
-{
-	boxes.back().rect.left += offset.x;
-	boxes.back().rect.top += offset.y;
-}
-
 void Gui::padding(sf::Vector2f pad)
 {
 	boxes.back().rect.left += pad.x / 2.0;
@@ -105,15 +93,11 @@ void Gui::padding(sf::Vector2f pad)
 	boxes.back().rect.height += pad.y;
 }
 
-void Gui::icon(sf::RenderWindow &window, sf::Texture &texture)
-{
 
-}
-
-void Gui::fill(sf::RenderWindow &window, sf::Color color)
+void Gui::fill(sf::RenderWindow &window, sf::Color color, sf::Vector2f offset)
 {
 	sf::RectangleShape shape;
-	shape.setPosition(boxes.back().rect.left, boxes.back().rect.top);
+	shape.setPosition(boxes.back().rect.left + offset.x, boxes.back().rect.top + offset.y);
 	shape.setSize({boxes.back().rect.width, boxes.back().rect.height});
 	shape.setFillColor(color);
 

@@ -72,19 +72,20 @@ void DrawingState::draw(float alpha)
 
 	for (const auto &color : colors) {
 		gui.pushBox({16.0 * scale, gui.getSize().y}, Layout::HORIZONTAL);
-		gui.offset({0, -gui.getSize().y / 2.f});
+
+		float offset = -gui.getSize().y * 0.5;
 
 		if (canvas.getStrokeColor() == color)
-			gui.offset({0, 6 * scale});
+			offset = -gui.getSize().y * 0.2;
 		else {
 			if (gui.hover(guiPos))
-				gui.offset({0, 6 * scale});
+				offset = -gui.getSize().y * 0.2;
 
 			if (gui.pressed(guiPos))
 				canvas.setStrokeColor(color);
 		}
 
-		gui.fill(app->window, color);
+		gui.fill(app->window, color, {0, offset});
 		gui.popBox();
 	}
 

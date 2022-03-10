@@ -12,7 +12,7 @@ private:
 	bool canPaint = true;
 
 	Gui gui;
-	float scale = 2.0;
+	float scale = 1.0;
 public:
 	DrawingState(App *app);
 	~DrawingState();

@@ -29,9 +29,6 @@ public:
 	void popBox();
 	bool hover(sf::Vector2f point);
 	bool pressed(sf::Vector2f point);
-	void resize(sf::Vector2f size);
-	void offset(sf::Vector2f offset);
 	void padding(sf::Vector2f pad);
-	void icon(sf::RenderWindow &window, sf::Texture &texture);
-	void fill(sf::RenderWindow &window, sf::Color color);
+	void fill(sf::RenderWindow &window, sf::Color color, sf::Vector2f offset = {0, 0});
 };
