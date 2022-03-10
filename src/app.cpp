@@ -2,9 +2,9 @@
 
 App::App()
 {
-	sm.setState(new DrawingState(this));
 	window.create(sf::VideoMode(1280, 720), "asunapixel");
-	window.setFramerateLimit(60);
+	window.setVerticalSyncEnabled(true);
+	sm.setState(new DrawingState(this));
 }
 
 App::~App()

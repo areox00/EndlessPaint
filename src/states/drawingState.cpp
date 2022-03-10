@@ -34,6 +34,12 @@ void DrawingState::processEvent(sf::Event &event)
 void DrawingState::update()
 {
 	canvas.update(app->worldPos, viewport.getBounds(), canPaint);
+
+	// debug remove later
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+		scale += 0.1;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+		scale -= 0.1;
 }
 
 void DrawingState::draw(float alpha)
@@ -51,14 +57,10 @@ void DrawingState::draw(float alpha)
 
 	gui.begin(app->window.getSize(), Layout::VERTICAL);
 
-	// empty space
-	gui.pushBox({gui.getSize().x, gui.getSize().y - 32}, Layout::VERTICAL);
-	gui.popBox();
-
-	// bottom bar
-	gui.pushBox({gui.getSize().x, gui.getRemainingSize().y}, Layout::FREE);
+	// bar
+	gui.pushBox({gui.getSize().x, 32 * scale}, Layout::FREE);
 	gui.fill(app->window, sf::Color::Black);
-	gui.padding({20.0, 0.0});
+	gui.padding({20.0 * scale, 0.0});
 
 	canPaint = !gui.hover(guiPos);
 
@@ -69,14 +71,14 @@ void DrawingState::draw(float alpha)
 	};
 
 	for (const auto &color : colors) {
-		gui.pushBox({16.0, gui.getSize().y}, Layout::HORIZONTAL);
-		gui.offset({0, gui.getSize().y / 2.f});
+		gui.pushBox({16.0 * scale, gui.getSize().y}, Layout::HORIZONTAL);
+		gui.offset({0, -gui.getSize().y / 2.f});
 
 		if (canvas.getStrokeColor() == color)
-			gui.offset({0, -6});
+			gui.offset({0, 6 * scale});
 		else {
 			if (gui.hover(guiPos))
-				gui.offset({0, -6});
+				gui.offset({0, 6 * scale});
 
 			if (gui.pressed(guiPos))
 				canvas.setStrokeColor(color);
