@@ -58,36 +58,81 @@ void DrawingState::draw(float alpha)
 	gui.begin(app->window.getSize(), Layout::VERTICAL);
 
 	// bar
-	gui.pushBox({gui.getSize().x, 32 * scale}, Layout::FREE);
-	gui.fill(app->window, sf::Color::Black);
-	gui.padding({20.0 * scale, 0.0});
+	gui.pushBox({gui.getSize().x, 32 * scale}, Layout::HORIZONTAL);
+	gui.fill(app->window, sf::Color(0x16, 0x20, 0x2D));
+	gui.padding({32.f * scale, 0.0});
 
+	// block drawing when mouse enters the bar
 	canPaint = !gui.hover(guiPos);
 
-	std::vector<sf::Color> colors = {
-		sf::Color::Red,
-		sf::Color::Blue,
-		sf::Color::Green
+	// basic colors for testing gui
+	std::vector<sf::Color> upperColors = {
+		sf::Color(0xFF, 0x83, 0x60),
+		sf::Color(0xE8, 0xE2, 0x88),
+		sf::Color(0x7D, 0xCE, 0x82)
 	};
 
-	for (const auto &color : colors) {
-		gui.pushBox({16.0 * scale, gui.getSize().y}, Layout::HORIZONTAL);
+	std::vector<sf::Color> bottomColors = {
+		sf::Color(0x3C, 0xDB, 0xD3),
+		sf::Color(0x42, 0xB8, 0xF6),
+		sf::Color(0xA6, 0xA2, 0xF9)
+	};
 
-		float offset = -gui.getSize().y * 0.5;
+	// palette
+	gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
+	gui.padding({0, 6 * scale});
 
-		if (canvas.getStrokeColor() == color)
-			offset = -gui.getSize().y * 0.2;
-		else {
-			if (gui.hover(guiPos))
-				offset = -gui.getSize().y * 0.2;
+	sf::Color fillColor;
 
-			if (gui.pressed(guiPos))
-				canvas.setStrokeColor(color);
+	// upper row
+	gui.pushBox({gui.getSize().x, gui.getSize().y / 2}, Layout::VERTICAL);
+	for (const auto &color : upperColors) {
+		fillColor = color;
+		gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
+
+		if (gui.hover(guiPos)) {
+			fillColor.a = 150;
 		}
 
-		gui.fill(app->window, color, {0, offset});
+		if (gui.pressed(guiPos)) {
+			canvas.setStrokeColor(color);
+			fillColor.a = 100;
+		}
+
+		gui.fill(app->window, fillColor);
 		gui.popBox();
 	}
+	gui.popBox();
 
+	// bottom row
+	gui.pushBox({gui.getSize().x, gui.getRemainingSize().y}, Layout::VERTICAL);
+	for (const auto &color : bottomColors) {
+		fillColor = color;
+		gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
+
+		if (gui.hover(guiPos)) {
+			fillColor.a = 150;
+		}
+
+		if (gui.pressed(guiPos)) {
+			canvas.setStrokeColor(color);
+			fillColor.a = 100;
+		}
+
+		gui.fill(app->window, fillColor);
+		gui.popBox();
+	}
+	gui.popBox();
+	// pop palette box and return to panel box
+	gui.popBox();
+
+	gui.space(8 * scale);
+
+	// color preview
+	gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
+	gui.padding({16.f * scale, 16.f * scale});
+	gui.fill(app->window, canvas.getStrokeColor());
+
+	// return back to world view
 	app->window.setView(viewport.getView());
 }

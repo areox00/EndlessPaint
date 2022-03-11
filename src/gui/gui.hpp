@@ -29,6 +29,7 @@ public:
 	void popBox();
 	bool hover(sf::Vector2f point);
 	bool pressed(sf::Vector2f point);
-	void padding(sf::Vector2f pad);
+	void padding(sf::Vector2f value);
+	void space(float value);
 	void fill(sf::RenderWindow &window, sf::Color color, sf::Vector2f offset = {0, 0});
 };

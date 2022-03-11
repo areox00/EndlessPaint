@@ -1,4 +1,5 @@
 #include "gui.hpp"
+#include <cassert>
 
 Gui::Gui()
 {
@@ -85,14 +86,29 @@ bool Gui::pressed(sf::Vector2f point)
 	return sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hover(point);
 }
 
-void Gui::padding(sf::Vector2f pad)
+void Gui::padding(sf::Vector2f value)
 {
-	boxes.back().rect.left += pad.x / 2.0;
-	boxes.back().rect.width += pad.x;
-	boxes.back().rect.top += pad.y / 2.0;
-	boxes.back().rect.height += pad.y;
+	boxes.back().rect.left += value.x / 2.f;
+	boxes.back().rect.width -= value.x;
+	boxes.back().rect.top += value.y / 2.f;
+	boxes.back().rect.height -= value.y;
 }
 
+void Gui::space(float value)
+{
+	switch (boxes.back().layout) {
+		case Layout::FREE:
+			fprintf(stderr, "Cannot use spacing with free layout\n");
+			exit(EXIT_FAILURE);
+			break;
+		case Layout::HORIZONTAL:
+			boxes.back().layoutPosition.x += value;
+			break;
+		case Layout::VERTICAL:
+			boxes.back().layoutPosition.y += value;
+			break;
+	}
+}
 
 void Gui::fill(sf::RenderWindow &window, sf::Color color, sf::Vector2f offset)
 {
