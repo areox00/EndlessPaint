@@ -1,4 +1,4 @@
-# asunapixel
+# EndlessPaint
 Attempt to create a simple program where you can paint on infinite canvas with friends.
 
 What I want to implement to achieve finished product:
@@ -16,7 +16,7 @@ or alternatively run these commands:
 ```
 meson build --buildtype=release
 ninja -C build
-./build/asunapixel
+./build/EndlessPaint
 ```
 
 ## Instructions for building on windows:
@@ -31,11 +31,11 @@ ninja -C build
 
 ### Building the project
 - Go into the command line
-- Change the directory to the `asunapixel`'s one
+- Change the directory to the `EndlessPaint`'s one
 - Build and run with the builder tool:
 	- `./builder -br` in powershell
 	- `builder -br` in cmd
 - Alternatively build and run on your own:
 	- Prebuild with `meson build --buildtype=release`
 	- Build with `ninja -C build`
-	- If compilation and linking succeeded, run with `./build/asunapixel` in powershell or `build\asunapixel.exe` in cmd.
+	- If compilation and linking succeeded, run with `./build/EndlessPaint` in powershell or `build\EndlessPaint.exe` in cmd.

@@ -2,7 +2,7 @@
 
 App::App()
 {
-	window.create(sf::VideoMode(1280, 720), "asunapixel");
+	window.create(sf::VideoMode(1280, 720), "EndlessPaint");
 	window.setFramerateLimit(60);
 	sm.setState(new DrawingState(this));
 }

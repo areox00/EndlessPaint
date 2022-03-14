@@ -12,11 +12,11 @@ goto CASE_%1
 :CASE_
 	echo Usage:
 	echo 	builder -b
-	echo 		Builds asunapixel
+	echo 		Builds EndlessPaint
 	echo 	builder -r
-	echo 		Runs asunapixel (only if built already)
+	echo 		Runs EndlessPaint (only if built already)
 	echo 	builder -br
-	echo 		Builds and then runs asunapixel
+	echo 		Builds and then runs EndlessPaint
 	goto END_CASE
 :CASE_build
 :CASE_-b
@@ -25,12 +25,12 @@ goto CASE_%1
 :CASE_-br
 	call :build %param2%
 	cd build
-	call asunapixel
+	call EndlessPaint
 	goto END_CASE
 :CASE_run
 :CASE_-r
 	cd build
-	call asunapixel
+	call EndlessPaint
 	goto END_CASE
 :END_CASE
 	exit /B %ERRORLEVEL%
