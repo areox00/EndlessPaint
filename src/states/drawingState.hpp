@@ -12,7 +12,9 @@ private:
 	bool canPaint = true;
 
 	Gui gui;
-	float scale = 1.f;
+	float strokeSize = 0.0f;
+
+	void processGui();
 public:
 	DrawingState(App *app);
 	~DrawingState();

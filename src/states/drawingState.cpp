@@ -5,6 +5,7 @@ DrawingState::DrawingState(App *app)
 	: State(app)
 {
 	viewport.init(&app->window);
+	canvas.setStrokeColor(sf::Color(0xFF, 0x83, 0x60));
 }
 
 DrawingState::~DrawingState()
@@ -12,45 +13,11 @@ DrawingState::~DrawingState()
 
 }
 
-void DrawingState::processEvent(sf::Event &event)
+void DrawingState::processGui()
 {
-	viewport.processEvent(event);
-
-	switch (event.type) {
-		case sf::Event::Closed:
-			app->window.close();
-			break;
-		case sf::Event::LostFocus:
-			canPaint = false;
-			break;
-		case sf::Event::GainedFocus:
-			canPaint = true;
-			break;
-		default:
-			break;
-	}
-}
-
-void DrawingState::update()
-{
-	canvas.update(app->worldPos, viewport.getBounds(), canPaint);
-
-	// debug remove later
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-		scale += 0.1;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-		scale -= 0.1;
-}
-
-void DrawingState::draw(float alpha)
-{
-	app->window.setView(viewport.getView());
-	canvas.draw(app->window);
-
 	sf::View guiView;
 	guiView.setCenter((sf::Vector2f)app->window.getSize() / 2.f);
 	guiView.setSize((sf::Vector2f)app->window.getSize());
-	//guiView.zoom(1.1);
 	app->window.setView(guiView);
 
 	sf::Vector2f guiPos = app->window.mapPixelToCoords(app->pixelPos);
@@ -58,12 +25,15 @@ void DrawingState::draw(float alpha)
 	gui.begin(app->window.getSize(), Layout::VERTICAL);
 
 	// bar
-	gui.pushBox({gui.getSize().x, 32 * scale}, Layout::HORIZONTAL);
+	gui.pushBox({gui.getSize().x, 32}, Layout::HORIZONTAL);
 	gui.fill(app->window, sf::Color(0x16, 0x20, 0x2D));
-	gui.padding({32.f * scale, 0.0});
+	gui.padding({32.f , 0.0});
 
 	// block drawing when mouse enters the bar
-	canPaint = !gui.hover(guiPos);
+	if (gui.block(guiPos))
+		canPaint = false;
+	else
+		canPaint = true;
 
 	// basic colors for testing gui
 	std::vector<sf::Color> upperColors = {
@@ -79,8 +49,8 @@ void DrawingState::draw(float alpha)
 	};
 
 	// palette
-	gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
-	gui.padding({0, 6 * scale});
+	gui.pushBox({gui.getSize().y / 2 * 3, gui.getSize().y}, Layout::HORIZONTAL);
+	gui.padding({6.f, 6.f});
 
 	sf::Color fillColor;
 
@@ -126,12 +96,71 @@ void DrawingState::draw(float alpha)
 	// pop palette box and return to panel box
 	gui.popBox();
 
-	gui.space(8 * scale);
-
 	// color preview
 	gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
-	gui.padding({16.f * scale, 16.f * scale});
+	gui.padding(gui.getSize() / 2.f);
 	gui.fill(app->window, canvas.getStrokeColor());
+	gui.popBox();
+
+	gui.space(8.f);
+
+	// text
+	sf::Font font;
+	font.loadFromFile("res/fonts/UbuntuMono-Bold.ttf");
+
+	gui.pushBox({100, gui.getSize().y / 2.f}, Layout::VERTICAL);
+	gui.padding({0, 6.f});
+	gui.text(app->window, 12, "brush size: " + std::to_string(int(strokeSize * 63) + 1), font);
+	gui.popBox();
+
+	// slider
+	gui.pushBox({100, gui.getRemainingSize().y}, Layout::HORIZONTAL);
+	gui.padding({0, 6.f});
+	gui.slider(app->window, guiPos, strokeSize);
+	canvas.setStrokeSize(strokeSize * 63 + 1);
+}
+
+void DrawingState::processEvent(sf::Event &event)
+{
+	viewport.processEvent(event);
+
+	switch (event.type) {
+		case sf::Event::Closed:
+			app->window.close();
+			break;
+		case sf::Event::LostFocus:
+			canPaint = false;
+			break;
+		case sf::Event::GainedFocus:
+			canPaint = true;
+			break;
+		case sf::Event::KeyPressed:
+			if (event.key.code == sf::Keyboard::Equal)
+				gui.scale(1.1);
+			if (event.key.code == sf::Keyboard::Hyphen)
+				gui.scale(0.9);
+			break;
+		default:
+			break;
+	}
+}
+
+void DrawingState::update()
+{
+	canvas.update(app->worldPos, viewport.getBounds(), canPaint);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Add))
+		gui.scale(1.1);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Subtract))
+		gui.scale(0.9);
+}
+
+void DrawingState::draw(float alpha)
+{
+	app->window.setView(viewport.getView());
+	canvas.draw(app->window);
+
+	processGui();
 
 	// return back to world view
 	app->window.setView(viewport.getView());

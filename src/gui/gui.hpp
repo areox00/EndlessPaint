@@ -17,6 +17,8 @@ struct Box {
 class Gui {
 private:
 	std::vector<Box> boxes;
+	float scaleFactor = 1.f;
+	bool triggered = false;
 public:
 	Gui();
 	~Gui();
@@ -27,9 +29,15 @@ public:
 	void begin(sf::Vector2u windowSize, Layout layout);
 	void pushBox(sf::Vector2f size, Layout layout);
 	void popBox();
+	bool block(sf::Vector2f point);
 	bool hover(sf::Vector2f point);
 	bool pressed(sf::Vector2f point);
 	void padding(sf::Vector2f value);
 	void space(float value);
 	void fill(sf::RenderWindow &window, sf::Color color, sf::Vector2f offset = {0, 0});
+	void slider(sf::RenderWindow &window, sf::Vector2f mouse, float &value);
+	void text(sf::RenderWindow &window, unsigned int characterSize, const std::string &string, const sf::Font &font);
+
+	void setScale(float value) { scaleFactor = value; }
+	void scale(float value) { scaleFactor *= value; }
 };

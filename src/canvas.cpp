@@ -166,3 +166,13 @@ sf::Color Canvas::getStrokeColor()
 {
 	return strokeColor;
 }
+
+void Canvas::setStrokeSize(uint8_t size)
+{
+	strokeSize = size;
+}
+
+uint8_t Canvas::getStrokeSize()
+{
+	return strokeSize;
+}

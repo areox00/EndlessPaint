@@ -17,7 +17,7 @@ private:
 
 	GlobalPosition oldPos, newPos;
 	uint8_t strokeSize = 2;
-	sf::Color strokeColor = sf::Color::Black;
+	sf::Color strokeColor;
 
 	void plotLineLow(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 	void plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
@@ -33,4 +33,7 @@ public:
 
 	void setStrokeColor(sf::Color color);
 	sf::Color getStrokeColor();
+
+	void setStrokeSize(uint8_t size);
+	uint8_t getStrokeSize();
 };
