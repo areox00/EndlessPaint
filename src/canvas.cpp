@@ -118,6 +118,9 @@ void Canvas::plotLine()
 
 void Canvas::setPointOutline(GlobalPosition pos)
 {
+	pos.x -= strokeSize / 2;
+	pos.y -= strokeSize / 2;
+
 	for (uint8_t y = 0; y < strokeSize; y++)
 		for (uint8_t x = 0; x < strokeSize; x++) {
 			if (x == 0 || x == strokeSize - 1 || y == 0 || y == strokeSize - 1) {
@@ -129,6 +132,9 @@ void Canvas::setPointOutline(GlobalPosition pos)
 
 void Canvas::setPointFull(GlobalPosition pos)
 {
+	pos.x -= strokeSize / 2;
+	pos.y -= strokeSize / 2;
+
 	for (uint8_t y = 0; y < strokeSize; y++)
 		for (uint8_t x = 0; x < strokeSize; x++) {
 			auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
