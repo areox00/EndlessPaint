@@ -32,7 +32,7 @@ void DrawingState::processGui()
 	gui.pushBox({gui.getSize().x, 32}, Layout::HORIZONTAL);
 	gui.fill(app->window, sf::Color(0x16, 0x20, 0x2D));
 
-	if (gui.block(guiPos) && Input::mousePressed(sf::Mouse::Left))
+	if (gui.block(guiPos))
 		block = true;
 	else if (Input::mouseReleased(sf::Mouse::Left))
 		block = false;
