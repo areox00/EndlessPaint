@@ -1,4 +1,5 @@
 #include "canvas.hpp"
+#include "input.hpp"
 
 Canvas::Canvas()
 {
@@ -64,7 +65,7 @@ void Canvas::plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 	setPointFull({x, y2});
 }
 
-void Canvas::plotLine()
+void Canvas::plotLine(GlobalPosition currentPosition, GlobalPosition previousPosition)
 {
 	/* Bresenham's line algorithm
 	 * edit: I was wrong
@@ -74,10 +75,10 @@ void Canvas::plotLine()
 
 	sf::IntRect affectedChunks;
 
-	affectedChunks.left = oldPos.x;
-	affectedChunks.top =  oldPos.y;
-	affectedChunks.width = newPos.x;
-	affectedChunks.height = newPos.y;
+	affectedChunks.left = previousPosition.x;
+	affectedChunks.top = previousPosition.y;
+	affectedChunks.width = currentPosition.x;
+	affectedChunks.height = currentPosition.y;
 
 	affectedChunks = sortVertices(affectedChunks);
 
@@ -95,18 +96,18 @@ void Canvas::plotLine()
 			chunksSprites[key].setPosition(x * CHUNK_SIZE, y * CHUNK_SIZE);
 		}
 
-	setPointFull(newPos);
-	if (std::abs(oldPos.y - newPos.y) < std::abs(oldPos.x - newPos.x)) {
-		if (newPos.x > oldPos.x)
-			plotLineLow(oldPos.x, oldPos.y, newPos.x, newPos.y);
+	setPointFull(currentPosition);
+	if (std::abs(previousPosition.y - currentPosition.y) < std::abs(previousPosition.x - currentPosition.x)) {
+		if (currentPosition.x > previousPosition.x)
+			plotLineLow(previousPosition.x, previousPosition.y, currentPosition.x, currentPosition.y);
 		else
-		 	plotLineLow(newPos.x, newPos.y, oldPos.x, oldPos.y);
+		 	plotLineLow(currentPosition.x, currentPosition.y, previousPosition.x, previousPosition.y);
 	}
 	else {
-		if (newPos.y > oldPos.y)
-			plotLineHigh(oldPos.x, oldPos.y, newPos.x, newPos.y);
+		if (currentPosition.y > previousPosition.y)
+			plotLineHigh(previousPosition.x, previousPosition.y, currentPosition.x, currentPosition.y);
 		else
-			plotLineHigh(newPos.x, newPos.y, oldPos.x, oldPos.y);
+			plotLineHigh(currentPosition.x, currentPosition.y, previousPosition.x, previousPosition.y);
 	}
 
 	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
@@ -135,19 +136,6 @@ void Canvas::setPointFull(GlobalPosition pos)
 			auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
 			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), strokeColor);
 		}
-}
-
-void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds, bool canPaint)
-{
-	mpos.x -= (mpos.x < 0);
-	mpos.y -= (mpos.y < 0);
-
-	oldPos = newPos;
-	newPos = GlobalPosition{(int32_t)mpos.x, (int32_t)mpos.y};
-
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && canPaint) {
-		plotLine();
-	}
 }
 
 void Canvas::draw(sf::RenderTarget &target)

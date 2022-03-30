@@ -1,5 +1,7 @@
 #include "gui.hpp"
+
 #include <algorithm>
+#include "input.hpp"
 
 Gui::Gui()
 {
@@ -92,7 +94,7 @@ bool Gui::hover(sf::Vector2f point)
 
 bool Gui::pressed(sf::Vector2f point)
 {
-	return sf::Mouse::isButtonPressed(sf::Mouse::Left) && hover(point);
+	return Input::mousePressed(sf::Mouse::Left) && hover(point);
 }
 
 void Gui::padding(sf::Vector2f value)
@@ -137,9 +139,9 @@ void Gui::slider(sf::RenderWindow &window, sf::Vector2f mouse, float &value)
 	bar.setSize({boxes.back().rect.width, boxes.back().rect.height / 2.f});
 	bar.setFillColor(sf::Color(0xB0, 0xC5, 0xE1));
 
-	if (pressed(mouse))
+	if (hover(mouse) && Input::mousePressed(sf::Mouse::Left))
 		triggered = true;
-	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	else if (Input::mouseReleased(sf::Mouse::Left))
 		triggered = false;
 
 	if (triggered) {

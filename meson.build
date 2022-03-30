@@ -9,10 +9,12 @@ src = [
     'src/app.cpp',
     'src/canvas.cpp',
     'src/chunk.cpp',
-    'src/main.cpp',
-    'src/viewport.cpp',
-
     'src/gui/gui.cpp',
+    'src/input.cpp',
+    'src/main.cpp',
+    'src/types.cpp',
+    'src/viewport.cpp',
+    'src/viewport.cpp',
 
     'src/states/stateManager.cpp',
     'src/states/drawingState.cpp'

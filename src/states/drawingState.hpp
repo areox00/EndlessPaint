@@ -5,14 +5,23 @@
 #include "viewport.hpp"
 #include "gui/gui.hpp"
 
+enum Tool {
+	BRUSH,
+	NONE,
+};
+
 class DrawingState : public State {
 private:
 	Canvas canvas;
 	Viewport viewport;
-	bool canPaint = true;
+
+	Tool tool = Tool::NONE;
 
 	Gui gui;
-	float strokeSize = 0.0f;
+	bool block;
+	float strokeScale = 0.0f;
+
+	GlobalPosition oldPos, newPos = {0, 0};
 
 	void processGui();
 public:

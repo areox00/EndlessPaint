@@ -1,5 +1,6 @@
 #include "drawingState.hpp"
 #include "app.hpp"
+#include "input.hpp"
 
 DrawingState::DrawingState(App *app)
 	: State(app)
@@ -22,18 +23,21 @@ void DrawingState::processGui()
 
 	sf::Vector2f guiPos = app->window.mapPixelToCoords(app->pixelPos);
 
+	if (tool != Tool::NONE)
+		Input::lock();
+
 	gui.begin(app->window.getSize(), Layout::VERTICAL);
 
 	// bar
 	gui.pushBox({gui.getSize().x, 32}, Layout::HORIZONTAL);
 	gui.fill(app->window, sf::Color(0x16, 0x20, 0x2D));
-	gui.padding({32.f , 0.0});
 
-	// block drawing when mouse enters the bar
-	if (gui.block(guiPos))
-		canPaint = false;
-	else
-		canPaint = true;
+	if (gui.block(guiPos) && Input::mousePressed(sf::Mouse::Left))
+		block = true;
+	else if (Input::mouseReleased(sf::Mouse::Left))
+		block = false;
+
+	gui.padding({32.f , 0.0});
 
 	// basic colors for testing gui
 	std::vector<sf::Color> upperColors = {
@@ -108,16 +112,18 @@ void DrawingState::processGui()
 	sf::Font font;
 	font.loadFromFile("res/fonts/UbuntuMono-Bold.ttf");
 
-	gui.pushBox({100, gui.getSize().y / 2.f}, Layout::VERTICAL);
+	gui.pushBox({80, gui.getSize().y / 2.f}, Layout::VERTICAL);
 	gui.padding({0, 6.f});
-	gui.text(app->window, 12, "brush size: " + std::to_string(int(strokeSize * 63) + 1), font);
+	gui.text(app->window, gui.getSize().y, "brush size: " + std::to_string(int(strokeScale * 63) + 1), font);
 	gui.popBox();
 
 	// slider
-	gui.pushBox({100, gui.getRemainingSize().y}, Layout::HORIZONTAL);
+	gui.pushBox({80, gui.getRemainingSize().y}, Layout::HORIZONTAL);
 	gui.padding({0, 6.f});
-	gui.slider(app->window, guiPos, strokeSize);
-	canvas.setStrokeSize(strokeSize * 63 + 1);
+	gui.slider(app->window, guiPos, strokeScale);
+	canvas.setStrokeSize(int(strokeScale * 63) + 1);
+
+	Input::unlock();
 }
 
 void DrawingState::processEvent(sf::Event &event)
@@ -129,10 +135,10 @@ void DrawingState::processEvent(sf::Event &event)
 			app->window.close();
 			break;
 		case sf::Event::LostFocus:
-			canPaint = false;
+			Input::lock();
 			break;
 		case sf::Event::GainedFocus:
-			canPaint = true;
+			Input::unlock();
 			break;
 		case sf::Event::KeyPressed:
 			if (event.key.code == sf::Keyboard::Equal)
@@ -147,7 +153,21 @@ void DrawingState::processEvent(sf::Event &event)
 
 void DrawingState::update()
 {
-	canvas.update(app->worldPos, viewport.getBounds(), canPaint);
+	oldPos = newPos;
+	newPos = vec2GlobalPos(app->worldPos);
+
+	if (Input::mousePressed(sf::Mouse::Left) && !block)
+		tool = Tool::BRUSH;
+	else if (Input::mouseReleased(sf::Mouse::Left))
+		tool = Tool::NONE;
+
+	switch (tool) {
+		case Tool::BRUSH:
+			canvas.plotLine(newPos, oldPos);
+			break;
+		case Tool::NONE:
+			break;
+	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Add))
 		gui.scale(1.1);

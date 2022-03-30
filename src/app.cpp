@@ -3,7 +3,7 @@
 App::App()
 {
 	sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+	settings.antialiasingLevel = 8;
 	window.create(sf::VideoMode(1280, 720), "asunapixel", sf::Style::Default, settings);
 	window.setVerticalSyncEnabled(true);
 	sm.setState(new DrawingState(this));
