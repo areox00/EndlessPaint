@@ -5,7 +5,7 @@ What I want to implement to achieve finished product:
 - [x] Simple drawing
 - [ ] Fast chunk system
 - [ ] Networking
-- [ ] Good UI/UX
+- [x] Basic GUI
 
 ## Compiling
 Simplest way is to use my little script to automate this process:
