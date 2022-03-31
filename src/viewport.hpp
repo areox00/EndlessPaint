@@ -4,19 +4,18 @@
 
 class Viewport {
 private:
-	const sf::RenderWindow *window;
-
 	sf::View view;
-	float zoom = 1.0;
+	float zoom = 1.f;
 	bool moving = false;
 	sf::Vector2f oldPos = {0, 0}, newPos;
 public:
-	Viewport() = default;
-	Viewport(const sf::RenderWindow *window);
+	Viewport();
 	~Viewport();
 
-	void init(sf::RenderWindow *window);
-	void processEvent(sf::Event &event);
-	const sf::IntRect getBounds();
-	inline const sf::View &getView() {return view;}
+	void processEvent(sf::Event &event, const sf::Window &window);
+	void setSize(sf::Vector2f size);
+	void setCenter(sf::Vector2f center);
+
+	sf::IntRect getBounds();
+	sf::View &getView() {return view;}
 };

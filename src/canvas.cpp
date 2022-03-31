@@ -1,4 +1,5 @@
 #include "canvas.hpp"
+#include "input.hpp"
 
 Canvas::Canvas()
 {
@@ -64,7 +65,7 @@ void Canvas::plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 	setPointFull({x, y2});
 }
 
-void Canvas::plotLine()
+void Canvas::plotLine(GlobalPosition currentPosition, GlobalPosition previousPosition)
 {
 	/* Bresenham's line algorithm
 	 * edit: I was wrong
@@ -74,15 +75,15 @@ void Canvas::plotLine()
 
 	sf::IntRect affectedChunks;
 
-	affectedChunks.left = oldPos.x;
-	affectedChunks.top =  oldPos.y;
-	affectedChunks.width = newPos.x;
-	affectedChunks.height = newPos.y;
+	affectedChunks.left = previousPosition.x;
+	affectedChunks.top = previousPosition.y;
+	affectedChunks.width = currentPosition.x;
+	affectedChunks.height = currentPosition.y;
 
 	affectedChunks = sortVertices(affectedChunks);
 
-	GlobalPosition leftUp = {affectedChunks.left - (int)strokeSize, affectedChunks.top - (int)strokeSize};
-	GlobalPosition rightDown = {affectedChunks.width + (int)strokeSize, affectedChunks.height + (int)strokeSize};
+	GlobalPosition leftUp = {affectedChunks.left - (int)brushSize, affectedChunks.top - (int)brushSize};
+	GlobalPosition rightDown = {affectedChunks.width + (int)brushSize, affectedChunks.height + (int)brushSize};
 
 	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
 		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
@@ -94,18 +95,18 @@ void Canvas::plotLine()
 			chunksSprites[key].setPosition(x * CHUNK_SIZE, y * CHUNK_SIZE);
 		}
 
-	setPointFull(newPos);
-	if (std::abs(oldPos.y - newPos.y) < std::abs(oldPos.x - newPos.x)) {
-		if (newPos.x > oldPos.x)
-			plotLineLow(oldPos.x, oldPos.y, newPos.x, newPos.y);
+	setPointFull(currentPosition);
+	if (std::abs(previousPosition.y - currentPosition.y) < std::abs(previousPosition.x - currentPosition.x)) {
+		if (currentPosition.x > previousPosition.x)
+			plotLineLow(previousPosition.x, previousPosition.y, currentPosition.x, currentPosition.y);
 		else
-		 	plotLineLow(newPos.x, newPos.y, oldPos.x, oldPos.y);
+		 	plotLineLow(currentPosition.x, currentPosition.y, previousPosition.x, previousPosition.y);
 	}
 	else {
-		if (newPos.y > oldPos.y)
-			plotLineHigh(oldPos.x, oldPos.y, newPos.x, newPos.y);
+		if (currentPosition.y > previousPosition.y)
+			plotLineHigh(previousPosition.x, previousPosition.y, currentPosition.x, currentPosition.y);
 		else
-			plotLineHigh(newPos.x, newPos.y, oldPos.x, oldPos.y);
+			plotLineHigh(currentPosition.x, currentPosition.y, previousPosition.x, previousPosition.y);
 	}
 
 	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
@@ -118,41 +119,28 @@ void Canvas::plotLine()
 
 void Canvas::setPointOutline(GlobalPosition pos)
 {
-	pos.x -= strokeSize / 2;
-	pos.y -= strokeSize / 2;
+	pos.x -= brushSize / 2;
+	pos.y -= brushSize / 2;
 
-	for (uint8_t y = 0; y < strokeSize; y++)
-		for (uint8_t x = 0; x < strokeSize; x++) {
-			if (x == 0 || x == strokeSize - 1 || y == 0 || y == strokeSize - 1) {
+	for (uint8_t y = 0; y < brushSize; y++)
+		for (uint8_t x = 0; x < brushSize; x++) {
+			if (x == 0 || x == brushSize - 1 || y == 0 || y == brushSize - 1) {
 				auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
-				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
+				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), brushColor);
 			}
 		}
 }
 
 void Canvas::setPointFull(GlobalPosition pos)
 {
-	pos.x -= strokeSize / 2;
-	pos.y -= strokeSize / 2;
+	pos.x -= brushSize / 2;
+	pos.y -= brushSize / 2;
 
-	for (uint8_t y = 0; y < strokeSize; y++)
-		for (uint8_t x = 0; x < strokeSize; x++) {
+	for (uint8_t y = 0; y < brushSize; y++)
+		for (uint8_t x = 0; x < brushSize; x++) {
 			auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
-			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), sf::Color::Blue);
+			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), brushColor);
 		}
-}
-
-void Canvas::update(sf::Vector2f mpos, sf::IntRect bounds, bool canPaint)
-{
-	mpos.x -= (mpos.x < 0);
-	mpos.y -= (mpos.y < 0);
-
-	oldPos = newPos;
-	newPos = GlobalPosition{(int32_t)mpos.x, (int32_t)mpos.y};
-
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && canPaint) {
-		plotLine();
-	}
 }
 
 void Canvas::draw(sf::RenderTarget &target)
@@ -160,4 +148,24 @@ void Canvas::draw(sf::RenderTarget &target)
 	for (const auto &i : chunksSprites) {
 		target.draw(i.second);
 	}
+}
+
+void Canvas::setBrushColor(sf::Color color)
+{
+	brushColor = color;
+}
+
+sf::Color Canvas::getBrushColor()
+{
+	return brushColor;
+}
+
+void Canvas::setBrushSize(uint8_t size)
+{
+	brushSize = size;
+}
+
+uint8_t Canvas::getBrushSize()
+{
+	return brushSize;
 }

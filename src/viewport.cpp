@@ -2,11 +2,9 @@
 
 #include <cmath>
 
-Viewport::Viewport(const sf::RenderWindow *window)
-	: window(window)
+Viewport::Viewport()
 {
-	view.setSize(window->getSize().x, window->getSize().y);
-	view.setCenter(0, 0);
+
 }
 
 Viewport::~Viewport()
@@ -14,18 +12,11 @@ Viewport::~Viewport()
 
 }
 
-void Viewport::init(sf::RenderWindow *window)
-{
-	view.setSize(window->getSize().x, window->getSize().y);
-	view.setCenter(0, 0);
-	this->window = window;
-}
-
-void Viewport::processEvent(sf::Event &event)
+void Viewport::processEvent(sf::Event &event, const sf::Window &window)
 {
 	switch (event.type) {
 		case sf::Event::Resized:
-			view.setSize(event.size.width*zoom, event.size.height*zoom);
+			view.setSize(event.size.width * zoom, event.size.height * zoom);
 			break;
 
 		case sf::Event::MouseWheelScrolled:
@@ -44,7 +35,7 @@ void Viewport::processEvent(sf::Event &event)
 		case sf::Event::MouseButtonPressed:
 			if (event.mouseButton.button == sf::Mouse::Right) {
 				moving = true;
-				oldPos = (sf::Vector2f)sf::Mouse::getPosition(*window);
+				oldPos = (sf::Vector2f)sf::Mouse::getPosition(window);
 			}
 			break;
 
@@ -72,7 +63,16 @@ void Viewport::processEvent(sf::Event &event)
 	}
 }
 
-const sf::IntRect Viewport::getBounds()
+void Viewport::setSize(sf::Vector2f size)
+{
+	view.setSize(size);
+}
+void Viewport::setCenter(sf::Vector2f center)
+{
+	view.setCenter(center);
+}
+
+sf::IntRect Viewport::getBounds()
 {
 	int left = view.getCenter().x - view.getSize().x / 2.f;
 	int right = view.getCenter().x + view.getSize().x / 2.f;

@@ -15,12 +15,11 @@ private:
 	std::unordered_map<uint64_t, sf::Texture> chunksTextures;
 	std::unordered_map<uint64_t, sf::Sprite> chunksSprites;
 
-	GlobalPosition oldPos, newPos;
-	uint8_t strokeSize = 1;
+	uint8_t brushSize = 2;
+	sf::Color brushColor;
 
 	void plotLineLow(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 	void plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
-	void plotLine();
 	void setPointFull(GlobalPosition pos);
 	void setPointOutline(GlobalPosition pos);
 public:
@@ -28,5 +27,11 @@ public:
 	~Canvas();
 
 	void draw(sf::RenderTarget &target);
-	void update(sf::Vector2f mpos, sf::IntRect bounds, bool canPaint);
+	void plotLine(GlobalPosition currentPosition, GlobalPosition previousPosition);
+
+	void setBrushColor(sf::Color color);
+	sf::Color getBrushColor();
+
+	void setBrushSize(uint8_t size);
+	uint8_t getBrushSize();
 };

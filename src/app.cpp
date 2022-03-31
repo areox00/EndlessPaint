@@ -2,8 +2,10 @@
 
 App::App()
 {
-	window.create(sf::VideoMode(1280, 720), "EndlessPaint");
-	window.setFramerateLimit(60);
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 8;
+	window.create(sf::VideoMode(1280, 720), "EndlessPaint", sf::Style::Default, settings);
+	window.setVerticalSyncEnabled(true);
 	sm.setState(new DrawingState(this));
 }
 
@@ -26,9 +28,6 @@ void App::update()
 
 	//printf("%f\n", 1 / dt);
 	//printf("%f\n", dt);
-
-	pixelPos = sf::Mouse::getPosition(window);
-	worldPos = window.mapPixelToCoords(pixelPos);
 
 	sm.getState()->update();
 }

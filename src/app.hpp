@@ -15,8 +15,6 @@ private:
 	void update();
 public:
 	sf::RenderWindow window;
-	sf::Vector2i pixelPos;
-	sf::Vector2f worldPos;
 
 	App();
 	~App();

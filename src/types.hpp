@@ -46,3 +46,5 @@ struct GlobalPosition {
 		return ChunkIndex(x2, y2);
 	}
 };
+
+GlobalPosition vec2GlobalPos(sf::Vector2f pos);
