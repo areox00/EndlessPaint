@@ -82,8 +82,8 @@ void Canvas::plotLine(GlobalPosition currentPosition, GlobalPosition previousPos
 
 	affectedChunks = sortVertices(affectedChunks);
 
-	GlobalPosition leftUp = {affectedChunks.left - (int)strokeSize, affectedChunks.top - (int)strokeSize};
-	GlobalPosition rightDown = {affectedChunks.width + (int)strokeSize, affectedChunks.height + (int)strokeSize};
+	GlobalPosition leftUp = {affectedChunks.left - (int)brushSize, affectedChunks.top - (int)brushSize};
+	GlobalPosition rightDown = {affectedChunks.width + (int)brushSize, affectedChunks.height + (int)brushSize};
 
 	for (int32_t y = leftUp.chunkIndex().y; y <= rightDown.chunkIndex().y; y++)
 		for (int32_t x = leftUp.chunkIndex().x; x <= rightDown.chunkIndex().x; x++) {
@@ -120,21 +120,21 @@ void Canvas::plotLine(GlobalPosition currentPosition, GlobalPosition previousPos
 
 void Canvas::setPointOutline(GlobalPosition pos)
 {
-	for (uint8_t y = 0; y < strokeSize; y++)
-		for (uint8_t x = 0; x < strokeSize; x++) {
-			if (x == 0 || x == strokeSize - 1 || y == 0 || y == strokeSize - 1) {
+	for (uint8_t y = 0; y < brushSize; y++)
+		for (uint8_t x = 0; x < brushSize; x++) {
+			if (x == 0 || x == brushSize - 1 || y == 0 || y == brushSize - 1) {
 				auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
-				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), strokeColor);
+				chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), brushColor);
 			}
 		}
 }
 
 void Canvas::setPointFull(GlobalPosition pos)
 {
-	for (uint8_t y = 0; y < strokeSize; y++)
-		for (uint8_t x = 0; x < strokeSize; x++) {
+	for (uint8_t y = 0; y < brushSize; y++)
+		for (uint8_t x = 0; x < brushSize; x++) {
 			auto finalPos = GlobalPosition{pos.x + x, pos.y + y};
-			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), strokeColor);
+			chunks.at(finalPos.chunkIndex().mapKey().key).setPixel(finalPos.positionInChunk(), brushColor);
 		}
 }
 
@@ -145,22 +145,22 @@ void Canvas::draw(sf::RenderTarget &target)
 	}
 }
 
-void Canvas::setStrokeColor(sf::Color color)
+void Canvas::setBrushColor(sf::Color color)
 {
-	strokeColor = color;
+	brushColor = color;
 }
 
-sf::Color Canvas::getStrokeColor()
+sf::Color Canvas::getBrushColor()
 {
-	return strokeColor;
+	return brushColor;
 }
 
-void Canvas::setStrokeSize(uint8_t size)
+void Canvas::setBrushSize(uint8_t size)
 {
-	strokeSize = size;
+	brushSize = size;
 }
 
-uint8_t Canvas::getStrokeSize()
+uint8_t Canvas::getBrushSize()
 {
-	return strokeSize;
+	return brushSize;
 }

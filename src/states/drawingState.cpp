@@ -5,8 +5,12 @@
 DrawingState::DrawingState(App *app)
 	: State(app)
 {
-	viewport.init(&app->window);
-	canvas.setStrokeColor(sf::Color(0xFF, 0x83, 0x60));
+	canvas.setBrushColor(sf::Color(0xFF, 0x83, 0x60));
+
+	viewport.setSize((sf::Vector2f)app->window.getSize());
+	viewport.setCenter({0, 0});
+
+	font.loadFromFile("res/fonts/UbuntuMono-Bold.ttf");
 }
 
 DrawingState::~DrawingState()
@@ -21,7 +25,7 @@ void DrawingState::processGui()
 	guiView.setSize((sf::Vector2f)app->window.getSize());
 	app->window.setView(guiView);
 
-	sf::Vector2f guiPos = app->window.mapPixelToCoords(app->pixelPos);
+	mouseGuiPos = app->window.mapPixelToCoords(mouseWindowPos, guiView);
 
 	if (tool != Tool::NONE)
 		Input::lock();
@@ -32,10 +36,10 @@ void DrawingState::processGui()
 	gui.pushBox({gui.getSize().x, 32}, Layout::HORIZONTAL);
 	gui.fill(app->window, sf::Color(0x16, 0x20, 0x2D));
 
-	if (gui.block(guiPos))
-		block = true;
+	if (gui.isAction(mouseGuiPos))
+		lockDrawing = true;
 	else if (Input::mouseReleased(sf::Mouse::Left))
-		block = false;
+		lockDrawing = false;
 
 	gui.padding({32.f , 0.0});
 
@@ -64,12 +68,12 @@ void DrawingState::processGui()
 		fillColor = color;
 		gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
 
-		if (gui.hover(guiPos)) {
+		if (gui.hover(mouseGuiPos)) {
 			fillColor.a = 150;
 		}
 
-		if (gui.pressed(guiPos)) {
-			canvas.setStrokeColor(color);
+		if (gui.pressed(mouseGuiPos)) {
+			canvas.setBrushColor(color);
 			fillColor.a = 100;
 		}
 
@@ -84,12 +88,12 @@ void DrawingState::processGui()
 		fillColor = color;
 		gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
 
-		if (gui.hover(guiPos)) {
+		if (gui.hover(mouseGuiPos)) {
 			fillColor.a = 150;
 		}
 
-		if (gui.pressed(guiPos)) {
-			canvas.setStrokeColor(color);
+		if (gui.pressed(mouseGuiPos)) {
+			canvas.setBrushColor(color);
 			fillColor.a = 100;
 		}
 
@@ -103,32 +107,29 @@ void DrawingState::processGui()
 	// color preview
 	gui.pushBox({gui.getSize().y, gui.getSize().y}, Layout::HORIZONTAL);
 	gui.padding(gui.getSize() / 2.f);
-	gui.fill(app->window, canvas.getStrokeColor());
+	gui.fill(app->window, canvas.getBrushColor());
 	gui.popBox();
 
 	gui.space(8.f);
 
 	// text
-	sf::Font font;
-	font.loadFromFile("res/fonts/UbuntuMono-Bold.ttf");
-
 	gui.pushBox({80, gui.getSize().y / 2.f}, Layout::VERTICAL);
 	gui.padding({0, 6.f});
-	gui.text(app->window, gui.getSize().y, "brush size: " + std::to_string(int(strokeScale * 63) + 1), font);
+	gui.text(app->window, gui.getSize().y, "brush size: " + std::to_string(int(brushScale * 63) + 1), font);
 	gui.popBox();
 
 	// slider
 	gui.pushBox({80, gui.getRemainingSize().y}, Layout::HORIZONTAL);
 	gui.padding({0, 6.f});
-	gui.slider(app->window, guiPos, strokeScale);
-	canvas.setStrokeSize(int(strokeScale * 63) + 1);
+	gui.slider(app->window, mouseGuiPos, brushScale);
+	canvas.setBrushSize(int(brushScale * 63) + 1);
 
 	Input::unlock();
 }
 
 void DrawingState::processEvent(sf::Event &event)
 {
-	viewport.processEvent(event);
+	viewport.processEvent(event, app->window);
 
 	switch (event.type) {
 		case sf::Event::Closed:
@@ -153,10 +154,13 @@ void DrawingState::processEvent(sf::Event &event)
 
 void DrawingState::update()
 {
-	oldPos = newPos;
-	newPos = vec2GlobalPos(app->worldPos);
+	mouseWindowPos = sf::Mouse::getPosition(app->window);
+	mouseCanvasPos = app->window.mapPixelToCoords(mouseWindowPos, viewport.getView());
 
-	if (Input::mousePressed(sf::Mouse::Left) && !block)
+	oldPos = newPos;
+	newPos = vec2GlobalPos(mouseCanvasPos);
+
+	if (Input::mousePressed(sf::Mouse::Left) && !lockDrawing)
 		tool = Tool::BRUSH;
 	else if (Input::mouseReleased(sf::Mouse::Left))
 		tool = Tool::NONE;
@@ -181,7 +185,4 @@ void DrawingState::draw(float alpha)
 	canvas.draw(app->window);
 
 	processGui();
-
-	// return back to world view
-	app->window.setView(viewport.getView());
 }

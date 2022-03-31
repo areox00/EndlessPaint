@@ -82,19 +82,19 @@ void Gui::popBox()
 	boxes.pop_back();
 }
 
-bool Gui::block(sf::Vector2f point)
+bool Gui::isAction(sf::Vector2f point)
 {
-	return triggered || hover(point);
+	return hover(point) || action;
 }
 
 bool Gui::hover(sf::Vector2f point)
 {
-	return boxes.back().rect.contains(point) && !triggered;
+	return boxes.back().rect.contains(point) && !action;
 }
 
 bool Gui::pressed(sf::Vector2f point)
 {
-	return Input::mousePressed(sf::Mouse::Left) && hover(point);
+	return hover(point) && Input::mousePressed(sf::Mouse::Left);
 }
 
 void Gui::padding(sf::Vector2f value)
@@ -140,11 +140,11 @@ void Gui::slider(sf::RenderWindow &window, sf::Vector2f mouse, float &value)
 	bar.setFillColor(sf::Color(0xB0, 0xC5, 0xE1));
 
 	if (hover(mouse) && Input::mousePressed(sf::Mouse::Left))
-		triggered = true;
+		action = true;
 	else if (Input::mouseReleased(sf::Mouse::Left))
-		triggered = false;
+		action = false;
 
-	if (triggered) {
+	if (action) {
 		value = (mouse.x - boxes.back().rect.left) / boxes.back().rect.width;
 		value = std::clamp(value, 0.f, 1.f);
 	}

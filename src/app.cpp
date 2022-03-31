@@ -29,9 +29,6 @@ void App::update()
 	//printf("%f\n", 1 / dt);
 	//printf("%f\n", dt);
 
-	pixelPos = sf::Mouse::getPosition(window);
-	worldPos = window.mapPixelToCoords(pixelPos);
-
 	sm.getState()->update();
 }
 

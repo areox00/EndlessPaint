@@ -18,10 +18,16 @@ private:
 	Tool tool = Tool::NONE;
 
 	Gui gui;
-	bool block;
-	float strokeScale = 0.0f;
+	bool lockDrawing;
+	float brushScale = 0.0f;
+
+	sf::Font font;
 
 	GlobalPosition oldPos, newPos = {0, 0};
+
+	sf::Vector2i mouseWindowPos;
+	sf::Vector2f mouseCanvasPos;
+	sf::Vector2f mouseGuiPos;
 
 	void processGui();
 public:

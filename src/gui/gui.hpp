@@ -18,7 +18,7 @@ class Gui {
 private:
 	std::vector<Box> boxes;
 	float scaleFactor = 1.f;
-	bool triggered = false;
+	bool action = false;
 public:
 	Gui();
 	~Gui();
@@ -29,7 +29,7 @@ public:
 	void begin(sf::Vector2u windowSize, Layout layout);
 	void pushBox(sf::Vector2f size, Layout layout);
 	void popBox();
-	bool block(sf::Vector2f point);
+	bool isAction(sf::Vector2f point);
 	bool hover(sf::Vector2f point);
 	bool pressed(sf::Vector2f point);
 	void padding(sf::Vector2f value);
