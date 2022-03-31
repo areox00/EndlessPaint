@@ -1,6 +1,6 @@
 #!/bin/bash
 
-program="asunapixel"
+program="EndlessPaint"
 
 build () {
 	if [ "$1" = "debug" ] ; then

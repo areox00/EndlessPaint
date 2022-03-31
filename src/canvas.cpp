@@ -92,7 +92,6 @@ void Canvas::plotLine(GlobalPosition currentPosition, GlobalPosition previousPos
 			chunks.try_emplace(key);
 			chunksTextures[key].create(CHUNK_SIZE, CHUNK_SIZE);
 			chunksSprites[key].setTexture(chunksTextures[key]);
-
 			chunksSprites[key].setPosition(x * CHUNK_SIZE, y * CHUNK_SIZE);
 		}
 
@@ -120,6 +119,9 @@ void Canvas::plotLine(GlobalPosition currentPosition, GlobalPosition previousPos
 
 void Canvas::setPointOutline(GlobalPosition pos)
 {
+	pos.x -= brushSize / 2;
+	pos.y -= brushSize / 2;
+
 	for (uint8_t y = 0; y < brushSize; y++)
 		for (uint8_t x = 0; x < brushSize; x++) {
 			if (x == 0 || x == brushSize - 1 || y == 0 || y == brushSize - 1) {
@@ -131,6 +133,9 @@ void Canvas::setPointOutline(GlobalPosition pos)
 
 void Canvas::setPointFull(GlobalPosition pos)
 {
+	pos.x -= brushSize / 2;
+	pos.y -= brushSize / 2;
+
 	for (uint8_t y = 0; y < brushSize; y++)
 		for (uint8_t x = 0; x < brushSize; x++) {
 			auto finalPos = GlobalPosition{pos.x + x, pos.y + y};

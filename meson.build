@@ -1,4 +1,4 @@
-project('asunapixel', 'cpp',
+project('EndlessPaint', 'cpp',
          default_options : 'cpp_std=c++20')
 
 deps = [
@@ -27,4 +27,4 @@ if host_machine.system() == 'linux'
     endif
 endif
 
-executable('asunapixel', src, include_directories : 'src', dependencies : deps)
+executable('EndlessPaint', src, include_directories : 'src', dependencies : deps)
