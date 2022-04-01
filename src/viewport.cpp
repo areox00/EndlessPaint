@@ -1,6 +1,7 @@
 #include "viewport.hpp"
 
 #include <cmath>
+#include <algorithm>
 
 Viewport::Viewport()
 {
@@ -16,20 +17,14 @@ void Viewport::processEvent(sf::Event &event, const sf::Window &window)
 {
 	switch (event.type) {
 		case sf::Event::Resized:
-			view.setSize(event.size.width * zoom, event.size.height * zoom);
+			view.setSize((sf::Vector2f)window.getSize() * zoom);
 			break;
 
 		case sf::Event::MouseWheelScrolled:
-			if(event.mouseWheelScroll.delta > 0) {
-				zoom *= 0.9;
-				view.zoom(0.9);
-			}
-			else if(event.mouseWheelScroll.delta < 0) {
-				if (zoom < 4.f) {
-					zoom *= 1.1;
-					view.zoom(1.1);
-				}
-			}
+			zoomLevel += -event.mouseWheelScroll.delta;
+			zoomLevel = std::clamp(zoomLevel, -24.f, 8.f);
+			zoom = powf(2.f, zoomLevel * 0.25f);
+			view.setSize((sf::Vector2f)window.getSize() * zoom);
 			break;
 
 		case sf::Event::MouseButtonPressed:
@@ -52,7 +47,7 @@ void Viewport::processEvent(sf::Event &event, const sf::Window &window)
 			newPos = sf::Vector2f(event.mouseMove.x, event.mouseMove.y);
 
 			sf::Vector2f deltaPos = oldPos - newPos;
-			deltaPos *= zoom;
+			deltaPos *= (float)zoom;
 
 			view.move(deltaPos);
 			oldPos = newPos;

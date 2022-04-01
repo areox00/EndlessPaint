@@ -6,6 +6,7 @@ class Viewport {
 private:
 	sf::View view;
 	float zoom = 1.f;
+	float zoomLevel = 1.f;
 	bool moving = false;
 	sf::Vector2f oldPos = {0, 0}, newPos;
 public:

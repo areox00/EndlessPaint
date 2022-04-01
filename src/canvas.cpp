@@ -143,10 +143,10 @@ void Canvas::setPointFull(GlobalPosition pos)
 		}
 }
 
-void Canvas::draw(sf::RenderTarget &target)
+void Canvas::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for (const auto &i : chunksSprites) {
-		target.draw(i.second);
+		target.draw(i.second, states);
 	}
 }
 

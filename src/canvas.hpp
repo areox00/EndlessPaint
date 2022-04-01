@@ -8,7 +8,7 @@
 #include "viewport.hpp"
 #include "types.hpp"
 
-class Canvas {
+class Canvas : public sf::Drawable {
 private:
 	// maybe implement std::hash for MapKey?
 	std::unordered_map<uint64_t, Chunk> chunks;
@@ -22,11 +22,11 @@ private:
 	void plotLineHigh(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 	void setPointFull(GlobalPosition pos);
 	void setPointOutline(GlobalPosition pos);
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 public:
 	Canvas();
 	~Canvas();
 
-	void draw(sf::RenderTarget &target);
 	void plotLine(GlobalPosition currentPosition, GlobalPosition previousPosition);
 
 	void setBrushColor(sf::Color color);

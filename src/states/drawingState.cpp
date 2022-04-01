@@ -182,7 +182,7 @@ void DrawingState::update()
 void DrawingState::draw(float alpha)
 {
 	app->window.setView(viewport.getView());
-	canvas.draw(app->window);
+	app->window.draw(canvas);
 
 	processGui();
 }
