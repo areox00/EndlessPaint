@@ -135,12 +135,6 @@ void DrawingState::processEvent(sf::Event &event)
 		case sf::Event::Closed:
 			app->window.close();
 			break;
-		case sf::Event::LostFocus:
-			Input::lock();
-			break;
-		case sf::Event::GainedFocus:
-			Input::unlock();
-			break;
 		case sf::Event::KeyPressed:
 			if (event.key.code == sf::Keyboard::Equal)
 				gui.scale(1.1);
@@ -159,6 +153,9 @@ void DrawingState::update()
 
 	oldPos = newPos;
 	newPos = vec2GlobalPos(mouseCanvasPos);
+
+	if (!app->window.hasFocus())
+		Input::lock();
 
 	if (Input::mousePressed(sf::Mouse::Left) && !lockDrawing)
 		tool = Tool::BRUSH;
