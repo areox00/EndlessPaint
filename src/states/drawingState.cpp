@@ -169,11 +169,6 @@ void DrawingState::update()
 		case Tool::NONE:
 			break;
 	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Add))
-		gui.scale(1.1);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Subtract))
-		gui.scale(0.9);
 }
 
 void DrawingState::draw(float alpha)
