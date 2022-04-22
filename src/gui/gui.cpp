@@ -164,13 +164,35 @@ void Gui::slider(sf::RenderWindow &window, sf::Vector2f mouse, float &value)
 	window.draw(handle);
 }
 
-void Gui::text(sf::RenderWindow &window, unsigned int characterSize, const std::string &string, const sf::Font &font)
+void Gui::text(sf::RenderWindow &window, unsigned int characterSize, const std::string &string, const sf::Font &font, AlignH alignH, AlignV alignV)
 {
 	sf::Text text;
 	text.setFont(font);
 	text.setCharacterSize(characterSize * scaleFactor);
 	text.setString(string);
-	text.setPosition((int)boxes.back().rect.left, int(boxes.back().rect.top + boxes.back().rect.height / 2.f - text.getGlobalBounds().height));
+	text.setPosition((int)boxes.back().rect.left, (int)boxes.back().rect.top);
+
+	switch (alignH) {
+		case AlignH::LEFT:
+			break;
+		case AlignH::CENTER:
+			text.move(int(boxes.back().rect.width / 2.f - text.getGlobalBounds().width / 2.f), 0);
+			break;
+		case AlignH::RIGHT:
+			text.move(int(boxes.back().rect.width - text.getGlobalBounds().width), 0);
+			break;
+	}
+
+	switch (alignV) {
+		case AlignV::TOP:
+			break;
+		case AlignV::CENTER:
+			text.move(0, int(boxes.back().rect.height / 2.f - font.getLineSpacing(characterSize * scaleFactor) / 2.f));
+			break;
+		case AlignV::BOTTOM:
+			text.move(0, int(boxes.back().rect.height - text.getGlobalBounds().height));
+			break;
+	}
 
 	window.draw(text);
 }

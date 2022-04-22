@@ -2,7 +2,19 @@
 
 #include <SFML/Graphics.hpp>
 
-enum Layout {
+enum class AlignH {
+	LEFT,
+	CENTER,
+	RIGHT
+};
+
+enum class AlignV {
+	TOP,
+	CENTER,
+	BOTTOM
+};
+
+enum class Layout {
 	FREE,
 	HORIZONTAL,
 	VERTICAL
@@ -36,7 +48,7 @@ public:
 	void space(float value);
 	void fill(sf::RenderWindow &window, sf::Color color, sf::Vector2f offset = {0, 0});
 	void slider(sf::RenderWindow &window, sf::Vector2f mouse, float &value);
-	void text(sf::RenderWindow &window, unsigned int characterSize, const std::string &string, const sf::Font &font);
+	void text(sf::RenderWindow &window, unsigned int characterSize, const std::string &string, const sf::Font &font, AlignH alignH, AlignV alignV);
 
 	void setScale(float value) { scaleFactor = value; }
 	void scale(float value) { scaleFactor *= value; }
