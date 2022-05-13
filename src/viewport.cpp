@@ -15,7 +15,7 @@ Viewport::~Viewport()
 
 sf::Vector2f Viewport::getMousePosition(sf::RenderWindow &window)
 {
-	return window.mapPixelToCoords(sf::Mouse::getPosition(window));
+	return window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
 }
 
 void Viewport::zoom(float level)
