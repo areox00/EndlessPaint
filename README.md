@@ -1,5 +1,5 @@
 # EndlessPaint
-Old, probably abandoned project.
+## Old, probably abandoned project.
 
 Attempt to create a simple program where you can paint on infinite canvas with friends.
 
