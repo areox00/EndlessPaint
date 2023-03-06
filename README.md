@@ -1,4 +1,6 @@
 # EndlessPaint
+Old, probably abandoned project.
+
 Attempt to create a simple program where you can paint on infinite canvas with friends.
 
 What I want to implement to achieve finished product:
